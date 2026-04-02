@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
 
 import {
   Container,
@@ -18,6 +19,7 @@ export const HomePage = () => {
   const [devices, setDevices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { isAuthenticated, signOut } = useContext(AuthContext);
 
   useEffect(() => {
     async function fetchDevices() {
@@ -53,7 +55,11 @@ export const HomePage = () => {
         <div className="header-actions">
           <Button className="outline" onClick={() => alert("Doar")}>Doar</Button>
           <Button className="outline" onClick={() => alert("Solicitar")}>Solicitar</Button>
-          <Button onClick={() => navigate("/login")}>Entrar</Button>
+          {isAuthenticated ? (
+            <Button onClick={signOut}>Sair</Button>
+          ) : (
+            <Button onClick={() => navigate("/login")}>Entrar</Button>
+          )}
         </div>
       </Header>
 
@@ -87,7 +93,9 @@ export const HomePage = () => {
             </select>
           </InputGroup>
 
-          <Button>🔍</Button>
+          <Button style={{ width: "auto", marginTop: 0, alignSelf: "flex-end" }}>
+            🔍
+          </Button>
         </Search>
       </Banner>
 
