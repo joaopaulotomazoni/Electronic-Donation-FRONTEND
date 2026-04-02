@@ -1,21 +1,31 @@
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
-import { Container, FormContainer, InputGroup, Button, LinkContainer } from "./styles";
+import {
+  Container,
+  FormContainer,
+  InputGroup,
+  Button,
+  LinkContainer,
+} from "./styles";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-export const Login = () => {
+export const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit() {
     try {
-      const response = await api.post("/login", {
+      const response = await api.post("/register", {
+        name,
         email,
         password,
+        confirmPassword,
       });
 
       if (response.data.userData && response.data.token) {
@@ -23,14 +33,28 @@ export const Login = () => {
         navigate("/home");
       }
     } catch (error) {
-      console.error("Falha no login:", error.response?.data || error.message);
+      console.error(
+        "Falha no cadastro:",
+        error.response?.data || error.message,
+      );
     }
   }
 
   return (
     <Container>
       <FormContainer>
-        <h2>Login</h2>
+        <h2>Criar Conta</h2>
+        <InputGroup>
+          <label htmlFor="name">Nome</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </InputGroup>
         <InputGroup>
           <label htmlFor="email">Email</label>
           <input
@@ -43,7 +67,7 @@ export const Login = () => {
           />
         </InputGroup>
         <InputGroup>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Senha</label>
           <input
             type="password"
             id="password"
@@ -53,9 +77,20 @@ export const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </InputGroup>
-        <Button onClick={handleSubmit}>Login</Button>
+        <InputGroup>
+          <label htmlFor="password">Confirmar senha</label>
+          <input
+            type="confirmPassword"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </InputGroup>
+        <Button onClick={handleSubmit}>Cadastrar</Button>
         <LinkContainer>
-          Não possui conta? <Link to="/signup">Criar conta</Link>
+          Já possui conta? <Link to="/login">Fazer login</Link>
         </LinkContainer>
       </FormContainer>
     </Container>
