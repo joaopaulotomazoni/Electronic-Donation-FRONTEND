@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-export const SignUp = () => {
+export const Cadastro = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

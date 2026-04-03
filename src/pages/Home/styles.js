@@ -41,7 +41,11 @@ export const Header = styled.header`
 export const Banner = styled.section`
   text-align: center;
   padding: 60px 20px;
-  background: linear-gradient(to right, ${({ theme }) => theme.colors.blue[400]}, ${({ theme }) => theme.colors.blue[600]});
+  background: linear-gradient(
+    to right,
+    ${({ theme }) => theme.colors.blue[400]},
+    ${({ theme }) => theme.colors.blue[600]}
+  );
   color: white;
 
   h2 {
@@ -90,7 +94,6 @@ export const InputGroup = styled.div`
   }
 `;
 
-/* GRID */
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -102,7 +105,6 @@ export const SectionTitle = styled.h3`
   padding: 20px;
 `;
 
-/* CARD */
 export const Card = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   padding: 15px;
