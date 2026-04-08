@@ -15,6 +15,7 @@ export const Cadastro = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export const Cadastro = () => {
     try {
       const response = await api.post("/register", {
         name,
+        cpf,
         email,
         password,
         confirmPassword,
@@ -53,6 +55,17 @@ export const Cadastro = () => {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+        </InputGroup>
+        <InputGroup>
+          <label htmlFor="cpf">CPF</label>
+          <input
+            type="text"
+            id="cpf"
+            name="cpf"
+            required
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
           />
         </InputGroup>
         <InputGroup>
