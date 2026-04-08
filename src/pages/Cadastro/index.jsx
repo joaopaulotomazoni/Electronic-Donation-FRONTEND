@@ -30,7 +30,7 @@ export const Cadastro = () => {
 
       if (response.data.userData && response.data.token) {
         signIn(response.data.userData, response.data.token);
-        navigate("/home");
+        navigate("/");
       }
     } catch (error) {
       console.error(

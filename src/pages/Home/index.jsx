@@ -63,8 +63,9 @@ export const Home = () => {
           Electronic Donation
         </Title>
         <Space>
-          <Button onClick={() => navigate("/doador")}>Doar</Button>
-          <Button onClick={() => alert("Solicitar")}>Solicitar</Button>
+          {isAuthenticated ?? (
+            <Button onClick={() => navigate("/doador")}>Doar</Button>
+          )}
           {isAuthenticated ? (
             <Button type="primary" danger onClick={handleSignOut}>
               Sair

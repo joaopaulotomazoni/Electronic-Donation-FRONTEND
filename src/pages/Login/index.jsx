@@ -1,6 +1,12 @@
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
-import { Container, FormContainer, InputGroup, Button, LinkContainer } from "./styles";
+import {
+  Container,
+  FormContainer,
+  InputGroup,
+  Button,
+  LinkContainer,
+} from "./styles";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -20,7 +26,7 @@ export const Login = () => {
 
       if (response.data.userData && response.data.token) {
         signIn(response.data.userData, response.data.token);
-        navigate("/home");
+        navigate("/");
       }
     } catch (error) {
       console.error("Falha no login:", error.response?.data || error.message);

@@ -9,7 +9,8 @@ export function AppRoutes() {
 
   return (
     <BrowserRouter>
-      {isAuthenticated ? <PrivateRoutes /> : <PublicRoutes />}
+      <PublicRoutes />
+      {isAuthenticated ?? <PrivateRoutes />}
     </BrowserRouter>
   );
 }

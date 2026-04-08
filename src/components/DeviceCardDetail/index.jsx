@@ -1,11 +1,51 @@
-import { Typography, Image, Descriptions, Input, Button, Space } from "antd";
+import {
+  Typography,
+  Image,
+  Descriptions,
+  Input,
+  Button,
+  Space,
+  message,
+} from "antd";
+import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { api } from "../../services/api";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export function DeviceCardDetail({ device, onClose }) {
+  const [justificativa, setJustificativa] = useState("");
+
+  const { user } = useAuth();
+
+  async function sendDeviceRequest() {
+    if (!user) {
+      message.warning(
+        "Você precisa estar logado para solicitar um dispositivo.",
+      );
+      return;
+    }
+
+    console.log({ user: user.id, device: device.id });
+    try {
+      await api.post(`/${user.id}/${device.id}/device-request`, {
+        justificativa,
+      });
+      message.success("Solicitação enviada com sucesso!");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      message.error("Erro ao enviar solicitação.");
+    }
+  }
+
   return (
-    <Space direction="vertical" size="middle" style={{ width: "100%", display: "flex" }}>
+    <Space
+      direction="vertical"
+      size="middle"
+      style={{ width: "100%", display: "flex" }}
+    >
       <div>
         <Title level={3} style={{ margin: 0 }}>
           {device.name}
@@ -15,18 +55,64 @@ export function DeviceCardDetail({ device, onClose }) {
         </Text>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Image
-          src={device.url}
-          alt={`Imagem de ${device.name}`}
-          style={{ width: 300, height: 300, objectFit: "cover", borderRadius: 8 }}
-        />
+      <div
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          gap: "16px",
+          paddingBottom: "8px",
+          justifyContent:
+            device.imagens && device.imagens.length > 1
+              ? "flex-start"
+              : "center",
+        }}
+      >
+        <Image.PreviewGroup>
+          {device.imagens && device.imagens.length > 0 ? (
+            device.imagens.map((img, index) => (
+              <div key={index} style={{ flexShrink: 0 }}>
+                <Image
+                  src={img.url}
+                  alt={`Imagem ${index + 1} de ${device.name}`}
+                  style={{
+                    width: 250,
+                    height: 250,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <div style={{ flexShrink: 0 }}>
+              <Image
+                src={device.url}
+                alt={`Imagem de ${device.name}`}
+                style={{
+                  width: 250,
+                  height: 250,
+                  objectFit: "cover",
+                  borderRadius: 8,
+                }}
+              />
+            </div>
+          )}
+        </Image.PreviewGroup>
       </div>
 
-      <Descriptions bordered column={2} size="small" style={{ tableLayout: "fixed" }}>
-        <Descriptions.Item label="Categoria">{device.category}</Descriptions.Item>
+      <Descriptions
+        bordered
+        column={2}
+        size="small"
+        style={{ tableLayout: "fixed" }}
+      >
+        <Descriptions.Item label="Categoria">
+          {device.category}
+        </Descriptions.Item>
         <Descriptions.Item label="Estado">{device.usage}</Descriptions.Item>
-        <Descriptions.Item label="Doador" span={2}>{device.donor}</Descriptions.Item>
+        <Descriptions.Item label="Doador" span={2}>
+          {device.usuarios.nome || "Não informado"}
+        </Descriptions.Item>
       </Descriptions>
 
       <Space direction="vertical" size="small" style={{ width: "100%" }}>
@@ -52,12 +138,18 @@ export function DeviceCardDetail({ device, onClose }) {
           placeholder="Explique por que você precisa deste dispositivo e como ele será útil para você..."
           rows={4}
           style={{ resize: "none" }}
+          value={justificativa}
+          onChange={(e) => setJustificativa(e.target.value)}
         />
       </Space>
 
-      <Space style={{ width: "100%", justifyContent: "flex-end", marginTop: 8 }}>
+      <Space
+        style={{ width: "100%", justifyContent: "flex-end", marginTop: 8 }}
+      >
         <Button onClick={onClose}>Cancelar</Button>
-        <Button type="primary">Enviar Solicitação</Button>
+        <Button type="primary" onClick={sendDeviceRequest}>
+          Enviar Solicitação
+        </Button>
       </Space>
     </Space>
   );
