@@ -1,5 +1,6 @@
 // import { Header } from "../../components/Header";
 // import { Footer } from "../../components/Footer";
+import { EditarDoacoes } from "./EditarDoacoes/index";
 import { ButtonsContainer, Container, Content } from "./styles";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
@@ -23,6 +24,7 @@ import {
 } from "antd";
 import { InboxOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { api } from "../../services/api";
+import { useTheme } from "styled-components";
 
 const { Title, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -32,7 +34,16 @@ export function TelaDoador() {
   const navigate = useNavigate();
   const [dispositivosDoar, setdispositivosDoar] = useState([]);
   const [solicitacoesRecebidas, setSolicitacoesRecebidas] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [editingDevice, setEditingDevice] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    category: null,
+    conservationState: null,
+    description: "",
+  });
 
+  const [editFileList, setEditFileList] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [registerDevice, setRegisterDevice] = useState({
     name: null,
@@ -40,8 +51,61 @@ export function TelaDoador() {
     conservationState: null,
     description: null,
   });
+  const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const { user } = useAuth();
+  const theme = useTheme();
+
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList((prevList) => [...prevList, file]);
+      return false;
+    },
+    fileList,
+    multiple: true,
+  };
+
+  const editUploadProps = {
+    onRemove: (file) => {
+      const index = editFileList.indexOf(file);
+      const newFileList = editFileList.slice();
+      newFileList.splice(index, 1);
+
+      // Se a imagem tiver URL, significa que já existe no backend.
+      // Logo, precisamos avisar o banco para deletar através do ID (uid).
+      if (file.url) {
+        setImagesToDelete((prev) => [...prev, file.uid]);
+      }
+
+      setEditFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setEditFileList((prevList) => [...prevList, file]);
+      return false;
+    },
+    fileList: editFileList,
+    multiple: true,
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Disponível":
+      case "doar":
+        return "success";
+      case "Solicitado":
+        return "warning";
+      case "Entregue":
+        return "processing";
+      default:
+        return "default";
+    }
+  };
 
   const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -104,32 +168,106 @@ export function TelaDoador() {
     }
   };
 
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      setFileList((prevList) => [...prevList, file]);
-      return false;
-    },
-    fileList,
-    multiple: true,
+  const showDrawer = (device) => {
+    setEditingDevice(device);
+
+    // Preenche os campos do state com os dados do dispositivo selecionado
+    setEditFormData({
+      name: device.nome_dispositivo,
+      category: device.categoria,
+      conservationState: device.estado_conservacao,
+      description: device.descricao,
+    });
+
+    // Carrega as imagens já existentes no Dragger do Drawer
+    if (device.imagens && device.imagens.length > 0) {
+      setEditFileList(
+        device.imagens.map((img, index) => ({
+          uid: img.id || String(index),
+          name: `imagem-${index}.png`,
+          status: "done",
+          url: img.url,
+        })),
+      );
+    } else {
+      setEditFileList([]);
+    }
+    setImagesToDelete([]);
+    setOpen(true);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Disponível":
-      case "doar":
-        return "success";
-      case "Solicitado":
-        return "warning";
-      case "Entregue":
-        return "processing";
-      default:
-        return "default";
+  const onClose = () => {
+    setOpen(false);
+    setEditingDevice(null);
+    setEditFormData({
+      name: "",
+      category: null,
+      conservationState: null,
+      description: "",
+    });
+    setEditFileList([]);
+    setImagesToDelete([]);
+  };
+
+  const handleEditSubmit = async () => {
+    if (
+      !editFormData.name ||
+      !editFormData.category ||
+      !editFormData.conservationState ||
+      !editFormData.description
+    ) {
+      message.error("Por favor, preencha todos os campos obrigatórios!");
+      return;
+    }
+
+    try {
+      // Converte novas imagens para base64 e preserva a URL das imagens que já estavam lá
+      const newImages = editFileList.filter((image) => !image.url);
+
+      const base64Images = await Promise.all(
+        newImages.map(async (file) => {
+          if (file.url) return file.url;
+          return await getBase64(file);
+        }),
+      );
+
+      const payload = {
+        ...editFormData,
+        images: base64Images,
+        imagesToDelete,
+      };
+
+      console.log(payload);
+      // OBS: Ajuste a rota para bater com o seu endpoint de edição do backend
+      await api.put(
+        `/${editingDevice.id || editingDevice.id_dispositivo}/device/update`,
+        payload,
+      );
+
+      message.success("Doação atualizada com sucesso!");
+      setOpen(false);
+
+      // Recarrega a lista de dispositivos
+      const response = await api.get(`/${user.id}/devices`);
+      setdispositivosDoar(response.data);
+    } catch (error) {
+      console.error("Erro ao atualizar:", error);
+      message.error("Falha ao atualizar a doação.");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(
+        `/${user.id}/device/${editingDevice.id || editingDevice.id_dispositivo}`,
+      );
+      message.success("Doação excluída com sucesso!");
+      setOpen(false);
+      const response = await api.get(`/${user.id}/devices`);
+      setdispositivosDoar(response.data);
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      message.error("Falha ao excluir a doação.");
     }
   };
 
@@ -363,7 +501,22 @@ export function TelaDoador() {
                 itemLayout="horizontal"
                 dataSource={dispositivosDoar}
                 renderItem={(donation) => (
-                  <List.Item actions={[]}>
+                  <List.Item
+                    actions={[
+                      <Button
+                        type="default"
+                        size="small"
+                        onClick={() => showDrawer(donation)}
+                        style={{
+                          border: "none",
+                          boxShadow: "none",
+                          color: theme.colors.blue?.[500],
+                        }}
+                      >
+                        Editar
+                      </Button>,
+                    ]}
+                  >
                     <List.Item.Meta
                       avatar={
                         <img
@@ -457,6 +610,15 @@ export function TelaDoador() {
             </Card>
           </Space>
         </Content>
+        <EditarDoacoes
+          open={open}
+          onClose={onClose}
+          editFormData={editFormData}
+          setEditFormData={setEditFormData}
+          handleEditSubmit={handleEditSubmit}
+          handleDelete={handleDelete}
+          editUploadProps={editUploadProps}
+        />
       </Container>
     </Layout>
   );
