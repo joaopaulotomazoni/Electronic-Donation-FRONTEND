@@ -77,8 +77,6 @@ export function TelaDoador() {
       const newFileList = editFileList.slice();
       newFileList.splice(index, 1);
 
-      // Se a imagem tiver URL, significa que já existe no backend.
-      // Logo, precisamos avisar o banco para deletar através do ID (uid).
       if (file.url) {
         setImagesToDelete((prev) => [...prev, file.uid]);
       }
@@ -96,11 +94,9 @@ export function TelaDoador() {
   const getStatusColor = (status) => {
     switch (status) {
       case "Disponível":
-      case "doar":
+      case "Aceito":
         return "success";
-      case "Solicitado":
-        return "warning";
-      case "Entregue":
+      case "Pendente":
         return "processing";
       default:
         return "default";
@@ -147,6 +143,17 @@ export function TelaDoador() {
         description: null,
       });
       setFileList([]);
+
+      const response = await api.get(`/${user.id}/devices`);
+
+      const responseMapper = response.data.map((device) => ({
+        ...device,
+        status: device.solicitacoes?.some((req) => req.status === "aceito")
+          ? "Aceito"
+          : "Pendente",
+      }));
+
+      setdispositivosDoar(responseMapper);
     } catch (error) {
       console.error(error);
       message.error("Falha ao cadastrar a doação.");
@@ -171,7 +178,6 @@ export function TelaDoador() {
   const showDrawer = (device) => {
     setEditingDevice(device);
 
-    // Preenche os campos do state com os dados do dispositivo selecionado
     setEditFormData({
       name: device.nome_dispositivo,
       category: device.categoria,
@@ -179,7 +185,6 @@ export function TelaDoador() {
       description: device.descricao,
     });
 
-    // Carrega as imagens já existentes no Dragger do Drawer
     if (device.imagens && device.imagens.length > 0) {
       setEditFileList(
         device.imagens.map((img, index) => ({
@@ -221,7 +226,6 @@ export function TelaDoador() {
     }
 
     try {
-      // Converte novas imagens para base64 e preserva a URL das imagens que já estavam lá
       const newImages = editFileList.filter((image) => !image.url);
 
       const base64Images = await Promise.all(
@@ -237,8 +241,6 @@ export function TelaDoador() {
         imagesToDelete,
       };
 
-      console.log(payload);
-      // OBS: Ajuste a rota para bater com o seu endpoint de edição do backend
       await api.put(
         `/${editingDevice.id || editingDevice.id_dispositivo}/device/update`,
         payload,
@@ -247,9 +249,16 @@ export function TelaDoador() {
       message.success("Doação atualizada com sucesso!");
       setOpen(false);
 
-      // Recarrega a lista de dispositivos
       const response = await api.get(`/${user.id}/devices`);
-      setdispositivosDoar(response.data);
+
+      const responseMapper = response.data.map((device) => ({
+        ...device,
+        status: device.solicitacoes?.some((req) => req.status === "aceito")
+          ? "Aceito"
+          : "Pendente",
+      }));
+
+      setdispositivosDoar(responseMapper);
     } catch (error) {
       console.error("Erro ao atualizar:", error);
       message.error("Falha ao atualizar a doação.");
@@ -259,12 +268,22 @@ export function TelaDoador() {
   const handleDelete = async () => {
     try {
       await api.delete(
-        `/${user.id}/device/${editingDevice.id || editingDevice.id_dispositivo}`,
+        `/${editingDevice.id || editingDevice.id_dispositivo}/device/delete`,
       );
+
       message.success("Doação excluída com sucesso!");
       setOpen(false);
+
       const response = await api.get(`/${user.id}/devices`);
-      setdispositivosDoar(response.data);
+
+      const responseMapper = response.data.map((device) => ({
+        ...device,
+        status: device.solicitacoes?.some((req) => req.status === "aceito")
+          ? "Aceito"
+          : "Pendente",
+      }));
+
+      setdispositivosDoar(responseMapper);
     } catch (error) {
       console.error("Erro ao excluir:", error);
       message.error("Falha ao excluir a doação.");
@@ -275,8 +294,15 @@ export function TelaDoador() {
     const fetchDevices = async () => {
       try {
         const response = await api.get(`/${user.id}/devices`);
-        console.log({ device: response.data });
-        setdispositivosDoar(response.data);
+
+        const responseMapper = response.data.map((device) => ({
+          ...device,
+          status: device.solicitacoes?.some((req) => req.status === "aceito")
+            ? "Aceito"
+            : "Pendente",
+        }));
+
+        setdispositivosDoar(responseMapper);
       } catch (error) {
         console.error("Erro ao carregar os dispositivos:", error);
       }
@@ -285,7 +311,6 @@ export function TelaDoador() {
     const fetchSolicitacoesRecebidas = async () => {
       try {
         const response = await api.get(`/${user.id}/user-device-with-request`);
-        console.log(response);
 
         const flattenedRequests =
           response.data?.flatMap((device) => {
@@ -510,8 +535,13 @@ export function TelaDoador() {
                         style={{
                           border: "none",
                           boxShadow: "none",
-                          color: theme.colors.blue?.[500],
+                          backgroundColor: "transparent",
+                          color:
+                            donation.status === "Aceito"
+                              ? theme.colors.gray?.[500]
+                              : theme.colors.blue?.[500],
                         }}
+                        disabled={donation.status === "Aceito"}
                       >
                         Editar
                       </Button>,

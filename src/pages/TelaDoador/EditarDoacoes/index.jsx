@@ -28,7 +28,7 @@ export function EditarDoacoes({
       open={open}
       extra={
         <Space>
-          <Button danger block>
+          <Button danger block onClick={handleDelete}>
             Excluir Doação
           </Button>
         </Space>
