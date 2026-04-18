@@ -36,9 +36,18 @@ export const Home = () => {
             device.imagens && device.imagens.length > 0
               ? device.imagens[0].url
               : "https://via.placeholder.com/150",
+          foiAceito: device.solicitacoes?.some(
+            (solicitacao) => solicitacao.status === "aceito",
+          ),
         }));
 
-        setDevices(mappedDevices);
+        const finalItens = mappedDevices.filter(
+          (device) => device.foiAceito !== true,
+        );
+
+        console.log(finalItens);
+
+        setDevices(finalItens);
       } catch (error) {
         console.log("Erro ao buscar dispositivos", error);
       }
