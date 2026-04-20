@@ -1,10 +1,10 @@
 // import { Header } from "../../components/Header";
 // import { Footer } from "../../components/Footer";
-import { EditarDoacoes } from "./EditarDoacoes/index";
-import { ButtonsContainer, Container, Content } from "./styles";
-import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { EditarDoacoes } from './EditarDoacoes/index';
+import { ButtonsContainer, Container, Content } from './styles';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import {
   Typography,
   Form,
@@ -21,10 +21,11 @@ import {
   Space,
   message,
   Layout,
-} from "antd";
-import { InboxOutlined, ArrowLeftOutlined } from "@ant-design/icons";
-import { api } from "../../services/api";
-import { useTheme } from "styled-components";
+  Spin,
+} from 'antd';
+import { InboxOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { api } from '../../services/api';
+import { useTheme } from 'styled-components';
 
 const { Title, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -37,10 +38,10 @@ export function TelaDoador() {
   const [open, setOpen] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [editFormData, setEditFormData] = useState({
-    name: "",
+    name: '',
     category: null,
     conservationState: null,
-    description: "",
+    description: '',
   });
 
   const [editFileList, setEditFileList] = useState([]);
@@ -52,6 +53,7 @@ export function TelaDoador() {
     description: null,
   });
   const [imagesToDelete, setImagesToDelete] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { user } = useAuth();
   const theme = useTheme();
@@ -93,13 +95,13 @@ export function TelaDoador() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Disponível":
-      case "Aceito":
-        return "success";
-      case "Pendente":
-        return "processing";
+      case 'Disponível':
+      case 'Aceito':
+        return 'success';
+      case 'Pendente':
+        return 'processing';
       default:
-        return "default";
+        return 'default';
     }
   };
 
@@ -118,12 +120,12 @@ export function TelaDoador() {
       !registerDevice.conservationState ||
       !registerDevice.description
     ) {
-      message.error("Por favor, preencha todos os campos obrigatórios!");
+      message.error('Por favor, preencha todos os campos obrigatórios!');
       return;
     }
 
     const base64Images = await Promise.all(
-      fileList.map((file) => getBase64(file)),
+      fileList.map((file) => getBase64(file))
     );
 
     const payload = {
@@ -132,9 +134,10 @@ export function TelaDoador() {
     };
 
     try {
+      setLoading(true);
       await api.post(`/${user.id}/device/register`, payload);
 
-      message.success("Doação cadastrada com sucesso!");
+      message.success('Doação cadastrada com sucesso!');
 
       setRegisterDevice({
         name: null,
@@ -148,30 +151,36 @@ export function TelaDoador() {
 
       const responseMapper = response.data.map((device) => ({
         ...device,
-        status: device.solicitacoes?.some((req) => req.status === "aceito")
-          ? "Aceito"
-          : "Pendente",
+        status: device.solicitacoes?.some((req) => req.status === 'aceito')
+          ? 'Aceito'
+          : 'Pendente',
       }));
 
       setdispositivosDoar(responseMapper);
     } catch (error) {
       console.error(error);
-      message.error("Falha ao cadastrar a doação.");
+      message.error('Falha ao cadastrar a doação.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateStatus = async (deviceId, status) => {
     try {
+      setLoading(true);
       await api.put(`/${deviceId}/updateStatus`, {
         status,
       });
       message.success(`Solicitação atualizada com sucesso!`);
       setSolicitacoesRecebidas((prev) =>
-        prev.filter((req) => req.id_dispositivo !== deviceId),
+        prev.filter((req) => req.id_dispositivo !== deviceId)
       );
+      fetchDevices();
     } catch (error) {
       console.error(error);
-      message.error("Erro ao atualizar o status da solicitação.");
+      message.error('Erro ao atualizar o status da solicitação.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,9 +199,9 @@ export function TelaDoador() {
         device.imagens.map((img, index) => ({
           uid: img.id || String(index),
           name: `imagem-${index}.png`,
-          status: "done",
+          status: 'done',
           url: img.url,
-        })),
+        }))
       );
     } else {
       setEditFileList([]);
@@ -205,10 +214,10 @@ export function TelaDoador() {
     setOpen(false);
     setEditingDevice(null);
     setEditFormData({
-      name: "",
+      name: '',
       category: null,
       conservationState: null,
-      description: "",
+      description: '',
     });
     setEditFileList([]);
     setImagesToDelete([]);
@@ -221,18 +230,19 @@ export function TelaDoador() {
       !editFormData.conservationState ||
       !editFormData.description
     ) {
-      message.error("Por favor, preencha todos os campos obrigatórios!");
+      message.error('Por favor, preencha todos os campos obrigatórios!');
       return;
     }
 
     try {
+      setLoading(true);
       const newImages = editFileList.filter((image) => !image.url);
 
       const base64Images = await Promise.all(
         newImages.map(async (file) => {
           if (file.url) return file.url;
           return await getBase64(file);
-        }),
+        })
       );
 
       const payload = {
@@ -243,80 +253,89 @@ export function TelaDoador() {
 
       await api.put(
         `/${editingDevice.id || editingDevice.id_dispositivo}/device/update`,
-        payload,
+        payload
       );
 
-      message.success("Doação atualizada com sucesso!");
+      message.success('Doação atualizada com sucesso!');
       setOpen(false);
 
       const response = await api.get(`/${user.id}/devices`);
 
       const responseMapper = response.data.map((device) => ({
         ...device,
-        status: device.solicitacoes?.some((req) => req.status === "aceito")
-          ? "Aceito"
-          : "Pendente",
+        status: device.solicitacoes?.some((req) => req.status === 'aceito')
+          ? 'Aceito'
+          : 'Pendente',
       }));
 
       setdispositivosDoar(responseMapper);
     } catch (error) {
-      console.error("Erro ao atualizar:", error);
-      message.error("Falha ao atualizar a doação.");
+      console.error('Erro ao atualizar:', error);
+      message.error('Falha ao atualizar a doação.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await api.delete(
-        `/${editingDevice.id || editingDevice.id_dispositivo}/device/delete`,
+        `/${editingDevice.id || editingDevice.id_dispositivo}/device/delete`
       );
 
-      message.success("Doação excluída com sucesso!");
+      message.success('Doação excluída com sucesso!');
       setOpen(false);
 
       const response = await api.get(`/${user.id}/devices`);
 
       const responseMapper = response.data.map((device) => ({
         ...device,
-        status: device.solicitacoes?.some((req) => req.status === "aceito")
-          ? "Aceito"
-          : "Pendente",
+        status: device.solicitacoes?.some((req) => req.status === 'aceito')
+          ? 'Aceito'
+          : 'Pendente',
       }));
 
       setdispositivosDoar(responseMapper);
     } catch (error) {
-      console.error("Erro ao excluir:", error);
-      message.error("Falha ao excluir a doação.");
+      console.error('Erro ao excluir:', error);
+      message.error('Falha ao excluir a doação.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDevices = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/${user.id}/devices`);
+
+      const responseMapper = response.data.map((device) => ({
+        ...device,
+        status: device.solicitacoes?.some((req) => req.status === 'aceito')
+          ? 'Aceito'
+          : 'Pendente',
+      }));
+
+      setdispositivosDoar(responseMapper);
+    } catch (error) {
+      console.error('Erro ao carregar os dispositivos:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const response = await api.get(`/${user.id}/devices`);
-
-        const responseMapper = response.data.map((device) => ({
-          ...device,
-          status: device.solicitacoes?.some((req) => req.status === "aceito")
-            ? "Aceito"
-            : "Pendente",
-        }));
-
-        setdispositivosDoar(responseMapper);
-      } catch (error) {
-        console.error("Erro ao carregar os dispositivos:", error);
-      }
-    };
-
     const fetchSolicitacoesRecebidas = async () => {
       try {
+        setLoading(true);
         const response = await api.get(`/${user.id}/user-device-with-request`);
 
         const flattenedRequests =
           response.data?.flatMap((device) => {
             if (!device.solicitacoes) return [];
             return device.solicitacoes
-              .filter((req) => req.status === "pendente")
+              .filter((req) => req.status === 'pendente')
               .map((req) => ({
                 ...req,
                 dispositivo: { nome_dispositivo: device.nome_dispositivo },
@@ -325,7 +344,9 @@ export function TelaDoador() {
 
         setSolicitacoesRecebidas(flattenedRequests);
       } catch (error) {
-        console.error("Erro ao carregar as solicitações:", error);
+        console.error('Erro ao carregar as solicitações:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -336,37 +357,37 @@ export function TelaDoador() {
   }, [user]);
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       <Header
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          backgroundColor: "white",
-          padding: "0 50px",
-          borderBottom: "1px solid #f0f0f0",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'white',
+          padding: '0 50px',
+          borderBottom: '1px solid #f0f0f0',
         }}
       >
-        <Title level={3} style={{ color: "#1890ff", margin: 0 }}>
+        <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
           Electronic Donation
         </Title>
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate("/")}
-          style={{ border: 0, boxShadow: "none" }}
+          onClick={() => navigate('/')}
+          style={{ border: 0, boxShadow: 'none' }}
         >
           Voltar para Home
         </Button>
       </Header>
       <Container>
-        <Title level={2} style={{ color: "#343a40", margin: 0 }}>
+        <Title level={2} style={{ color: '#343a40', margin: 0 }}>
           Área do Doador
         </Title>
         <Paragraph
           style={{
-            color: "#6c757d",
-            marginTop: "0.5rem",
-            marginBottom: "2.5rem",
+            color: '#6c757d',
+            marginTop: '0.5rem',
+            marginBottom: '2.5rem',
           }}
         >
           Cadastre seus dispositivos e ajude quem precisa
@@ -379,150 +400,157 @@ export function TelaDoador() {
                 Cadastrar Nova Doação
               </Title>
             }
-            style={{ borderRadius: 8, height: "fit-content" }}
+            style={{ borderRadius: 8, height: 'fit-content' }}
           >
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 500,
-                }}
-              >
-                Nome do Dispositivo <span style={{ color: "#ff4d4f" }}>*</span>
-              </label>
-              <Input
-                size="large"
-                placeholder="Ex: Notebook Dell Inspiron 15"
-                value={registerDevice.name || ""}
-                onChange={(e) =>
-                  setRegisterDevice({ ...registerDevice, name: e.target.value })
-                }
-              />
-            </div>
+            <Spin spinning={loading} tip="Carregando...">
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Nome do Dispositivo{' '}
+                  <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Input
+                  size="large"
+                  placeholder="Ex: Notebook Dell Inspiron 15"
+                  value={registerDevice.name || ''}
+                  onChange={(e) =>
+                    setRegisterDevice({
+                      ...registerDevice,
+                      name: e.target.value,
+                    })
+                  }
+                />
+              </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 500,
-                }}
-              >
-                Categoria <span style={{ color: "#ff4d4f" }}>*</span>
-              </label>
-              <Select
-                size="large"
-                style={{ width: "100%" }}
-                placeholder="Selecione uma categoria"
-                value={registerDevice.category}
-                onChange={(value) =>
-                  setRegisterDevice({ ...registerDevice, category: value })
-                }
-                options={[
-                  { value: "notebook", label: "notebook" },
-                  { value: "smartphone", label: "smartphone" },
-                  { value: "tablet", label: "tablet" },
-                ]}
-              />
-            </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Categoria <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione uma categoria"
+                  value={registerDevice.category}
+                  onChange={(value) =>
+                    setRegisterDevice({ ...registerDevice, category: value })
+                  }
+                  options={[
+                    { value: 'notebook', label: 'notebook' },
+                    { value: 'smartphone', label: 'smartphone' },
+                    { value: 'tablet', label: 'tablet' },
+                  ]}
+                />
+              </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 500,
-                }}
-              >
-                Estado de Conservação{" "}
-                <span style={{ color: "#ff4d4f" }}>*</span>
-              </label>
-              <Select
-                size="large"
-                style={{ width: "100%" }}
-                placeholder="Selecione o estado"
-                value={registerDevice.conservationState}
-                onChange={(value) =>
-                  setRegisterDevice({
-                    ...registerDevice,
-                    conservationState: value,
-                  })
-                }
-                options={[
-                  { value: "Novo", label: "Novo" },
-                  {
-                    value: "Usado - em bom estado",
-                    label: "Usado - em bom estado",
-                  },
-                  {
-                    value: "Usado - com defeito",
-                    label: "Usado - com defeito",
-                  },
-                ]}
-              />
-            </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Estado de Conservação{' '}
+                  <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione o estado"
+                  value={registerDevice.conservationState}
+                  onChange={(value) =>
+                    setRegisterDevice({
+                      ...registerDevice,
+                      conservationState: value,
+                    })
+                  }
+                  options={[
+                    { value: 'Novo', label: 'Novo' },
+                    {
+                      value: 'Usado - em bom estado',
+                      label: 'Usado - em bom estado',
+                    },
+                    {
+                      value: 'Usado - com defeito',
+                      label: 'Usado - com defeito',
+                    },
+                  ]}
+                />
+              </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 500,
-                }}
-              >
-                Descrição <span style={{ color: "#ff4d4f" }}>*</span>
-              </label>
-              <Input.TextArea
-                rows={4}
-                placeholder="Descreva o dispositivo, especificações técnicas, acessórios incluídos..."
-                value={registerDevice.description || ""}
-                onChange={(e) =>
-                  setRegisterDevice({
-                    ...registerDevice,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Descrição <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Input.TextArea
+                  rows={4}
+                  placeholder="Descreva o dispositivo, especificações técnicas, acessórios incluídos..."
+                  value={registerDevice.description || ''}
+                  onChange={(e) =>
+                    setRegisterDevice({
+                      ...registerDevice,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 500,
-                }}
-              >
-                Imagens do Dispositivo
-              </label>
-              <Dragger {...uploadProps}>
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">
-                  Clique para fazer upload ou arraste as imagens
-                </p>
-              </Dragger>
-            </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Imagens do Dispositivo
+                </label>
+                <Dragger {...uploadProps}>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                  </p>
+                  <p className="ant-upload-text">
+                    Clique para fazer upload ou arraste as imagens
+                  </p>
+                </Dragger>
+              </div>
 
-            <div style={{ marginTop: "2rem" }}>
-              <Button type="primary" size="large" onClick={handleSubmit}>
-                Cadastrar Doação
-              </Button>
-            </div>
+              <div style={{ marginTop: '2rem' }}>
+                <Button type="primary" size="large" onClick={handleSubmit}>
+                  Cadastrar Doação
+                </Button>
+              </div>
+            </Spin>
           </Card>
 
-          <Space direction="vertical" size="large" style={{ display: "flex" }}>
+          <Space direction="vertical" size="large" style={{ display: 'flex' }}>
             <Card
               title={
                 <Title level={4} style={{ margin: 0 }}>
                   Minhas Doações
                 </Title>
               }
-              style={{ borderRadius: 8, width: "100%", minWidth: 400 }}
+              style={{ borderRadius: 8, width: '100%', minWidth: 400 }}
             >
               <List
+                loading={loading}
                 itemLayout="horizontal"
                 dataSource={dispositivosDoar}
                 renderItem={(donation) => (
@@ -533,15 +561,15 @@ export function TelaDoador() {
                         size="small"
                         onClick={() => showDrawer(donation)}
                         style={{
-                          border: "none",
-                          boxShadow: "none",
-                          backgroundColor: "transparent",
+                          border: 'none',
+                          boxShadow: 'none',
+                          backgroundColor: 'transparent',
                           color:
-                            donation.status === "Aceito"
+                            donation.status === 'Aceito'
                               ? theme.colors.gray?.[500]
                               : theme.colors.blue?.[500],
                         }}
-                        disabled={donation.status === "Aceito"}
+                        disabled={donation.status === 'Aceito'}
                       >
                         Editar
                       </Button>,
@@ -553,15 +581,15 @@ export function TelaDoador() {
                           src={
                             donation.imagens && donation.imagens.length > 0
                               ? donation.imagens[0].url
-                              : "https://via.placeholder.com/60x60/E9ECEF/868E96.png?text=IMG"
+                              : 'https://via.placeholder.com/60x60/E9ECEF/868E96.png?text=IMG'
                           }
                           alt={donation.nome_dispositivo}
                           style={{
                             width: 50,
                             height: 50,
                             borderRadius: 8,
-                            objectFit: "cover",
-                            border: "1px solid #dee2e6",
+                            objectFit: 'cover',
+                            border: '1px solid #dee2e6',
                           }}
                         />
                       }
@@ -587,9 +615,10 @@ export function TelaDoador() {
                   Solicitações Recebidas
                 </Title>
               }
-              style={{ borderRadius: 8, width: "100%", minWidth: 400 }}
+              style={{ borderRadius: 8, width: '100%', minWidth: 400 }}
             >
               <List
+                loading={loading}
                 itemLayout="horizontal"
                 dataSource={solicitacoesRecebidas}
                 renderItem={(req) => (
@@ -599,7 +628,7 @@ export function TelaDoador() {
                         type="primary"
                         size="small"
                         onClick={() =>
-                          handleUpdateStatus(req.id_dispositivo, "aceito")
+                          handleUpdateStatus(req.id_dispositivo, 'aceito')
                         }
                       >
                         Aceitar
@@ -608,7 +637,7 @@ export function TelaDoador() {
                         danger
                         size="small"
                         onClick={() =>
-                          handleUpdateStatus(req.id_dispositivo, "rejeitado")
+                          handleUpdateStatus(req.id_dispositivo, 'rejeitado')
                         }
                       >
                         Rejeitar
@@ -619,17 +648,17 @@ export function TelaDoador() {
                       title={
                         <span style={{ fontWeight: 600 }}>
                           {req.dispositivo?.nome_dispositivo ||
-                            "Dispositivo Solicitado"}
+                            'Dispositivo Solicitado'}
                         </span>
                       }
                       description={
                         <>
                           <div>
-                            <strong>Justificativa:</strong>{" "}
-                            {req.justificativa || "Não informada."}
+                            <strong>Justificativa:</strong>{' '}
+                            {req.justificativa || 'Não informada.'}
                           </div>
                           <div>
-                            <strong>Status:</strong> {req.status || "Pendente"}
+                            <strong>Status:</strong> {req.status || 'Pendente'}
                           </div>
                         </>
                       }
@@ -648,6 +677,7 @@ export function TelaDoador() {
           handleEditSubmit={handleEditSubmit}
           handleDelete={handleDelete}
           editUploadProps={editUploadProps}
+          loading={loading}
         />
       </Container>
     </Layout>

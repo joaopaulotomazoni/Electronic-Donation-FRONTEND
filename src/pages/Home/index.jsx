@@ -1,30 +1,41 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { api } from "../../services/api";
-import { DeviceCard } from "../../components/DeviceCard";
-import { useAuth } from "../../hooks/useAuth";
-import { Layout, Button, Input, Select, Typography, Space, List } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../../services/api';
+import { DeviceCard } from '../../components/DeviceCard';
+import { useAuth } from '../../hooks/useAuth';
+import {
+  Layout,
+  Button,
+  Input,
+  Select,
+  Typography,
+  Space,
+  List,
+  Spin,
+} from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
 const { Header, Content } = Layout;
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 export const Home = () => {
   const [devices, setDevices] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const { isAuthenticated, signOut } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const { isAuthenticated, signOut, user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   function handleSignOut() {
     signOut();
-    navigate("/login");
+    navigate('/login');
   }
 
   useEffect(() => {
     async function fetchDevices() {
       try {
-        const response = await api.get("/devices");
+        setLoading(true);
+        const response = await api.get('/devices');
 
         const mappedDevices = response.data.map((device) => ({
           ...device,
@@ -35,49 +46,58 @@ export const Home = () => {
           url:
             device.imagens && device.imagens.length > 0
               ? device.imagens[0].url
-              : "https://via.placeholder.com/150",
+              : 'https://via.placeholder.com/150',
           foiAceito: device.solicitacoes?.some(
-            (solicitacao) => solicitacao.status === "aceito",
+            (solicitacao) => solicitacao.status === 'aceito'
           ),
         }));
 
-        const finalItens = mappedDevices.filter(
-          (device) => device.foiAceito !== true,
-        );
+        let finalItens = [];
 
-        console.log(finalItens);
+        if (user?.id) {
+          finalItens = mappedDevices.filter(
+            (device) =>
+              device.foiAceito !== true && device.id_usuario !== user.id
+          );
+        } else {
+          finalItens = mappedDevices.filter(
+            (device) => device.foiAceito !== true
+          );
+        }
 
         setDevices(finalItens);
       } catch (error) {
-        console.log("Erro ao buscar dispositivos", error);
+        console.log('Erro ao buscar dispositivos', error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchDevices();
-  }, []);
+  }, [user]);
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: "#f0f2f5" }}>
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
       <Header
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          backgroundColor: "white",
-          padding: "0 50px",
-          borderBottom: "1px solid #f0f0f0",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'white',
+          padding: '0 50px',
+          borderBottom: '1px solid #f0f0f0',
         }}
       >
-        <Title level={3} style={{ color: "#1890ff", margin: 0 }}>
+        <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
           Electronic Donation
         </Title>
         <Space>
           {isAuthenticated && (
             <>
-              <Button onClick={() => navigate("/doador")}>
+              <Button onClick={() => navigate('/doador')}>
                 Tela do doador
               </Button>
-              <Button onClick={() => navigate("/recebedor")}>
+              <Button onClick={() => navigate('/recebedor')}>
                 Tela do recebedor
               </Button>
             </>
@@ -87,34 +107,34 @@ export const Home = () => {
               Sair
             </Button>
           ) : (
-            <Button type="primary" onClick={() => navigate("/login")}>
+            <Button type="primary" onClick={() => navigate('/login')}>
               Entrar
             </Button>
           )}
         </Space>
       </Header>
-      <Content style={{ padding: "0 50px", marginTop: 24 }}>
+      <Content style={{ padding: '0 50px', marginTop: 24 }}>
         <div
           style={{
-            background: "linear-gradient(to right, #40a9ff, #1890ff)",
-            padding: "40px",
-            textAlign: "center",
-            color: "white",
+            background: 'linear-gradient(to right, #40a9ff, #1890ff)',
+            padding: '40px',
+            textAlign: 'center',
+            color: 'white',
             borderRadius: 8,
             marginBottom: 24,
           }}
         >
-          <Title level={2} style={{ color: "white" }}>
+          <Title level={2} style={{ color: 'white' }}>
             Doe ou Receba Dispositivos Eletrônicos
           </Title>
-          <Paragraph style={{ color: "rgba(255, 255, 255, 0.85)" }}>
+          <Paragraph style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
             Transforme tecnologia em oportunidade
           </Paragraph>
           <Space
             direction="horizontal"
             size="middle"
             wrap
-            style={{ justifyContent: "center" }}
+            style={{ justifyContent: 'center' }}
           >
             <Input
               placeholder="Buscar notebooks, celulares..."
@@ -132,19 +152,25 @@ export const Home = () => {
           </Space>
         </div>
 
-        <div style={{ background: "#fff", padding: 24, borderRadius: 8 }}>
+        <div style={{ background: '#fff', padding: 24, borderRadius: 8 }}>
           <Title level={4} style={{ marginBottom: 24 }}>
             Dispositivos Disponíveis
           </Title>
-          <List
-            grid={{ gutter: 24, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
-            dataSource={devices}
-            renderItem={(item) => (
-              <List.Item>
-                <DeviceCard device={item} />
-              </List.Item>
-            )}
-          />
+          <Spin
+            spinning={loading}
+            size="large"
+            tip="Carregando dispositivos..."
+          >
+            <List
+              grid={{ gutter: 24, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
+              dataSource={devices}
+              renderItem={(item) => (
+                <List.Item>
+                  <DeviceCard device={item} />
+                </List.Item>
+              )}
+            />
+          </Spin>
         </div>
       </Content>
     </Layout>
