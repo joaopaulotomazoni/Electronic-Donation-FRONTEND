@@ -40,7 +40,7 @@ export const Login = () => {
 
   return (
     <Container>
-      <Spin spinning={loading} size="large">
+      <Spin spinning={loading} description="Entrando..." size="large">
         <FormContainer>
           <h2>Login</h2>
           <InputGroup>
