@@ -21,6 +21,10 @@ import {
 import { InboxOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { api } from '../../services/api';
 import { useTheme } from 'styled-components';
+import { UF } from '../../constants/uf';
+import { DEVICE_STATUS } from '../../constants/deviceState';
+import { DEVICE_CATEGORY } from '../../constants/deviceCategory';
+import { GlobalHeader } from '../../components/GlobalHeader';
 
 const { Title, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -46,9 +50,12 @@ export function TelaDoador() {
     category: null,
     conservationState: null,
     description: null,
+    uf: null,
+    city: null,
   });
   const [imagesToDelete, setImagesToDelete] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cidadesList, setCidadesList] = useState([]);
 
   const { user } = useAuth();
   const theme = useTheme();
@@ -121,12 +128,35 @@ export function TelaDoador() {
     }
   }, [user.id]);
 
+  const fetchCidades = async (uf) => {
+    try {
+      const response = await fetch(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+      );
+      const data = await response.json();
+      const cidadesFormatadas = data.map((cidadeIBGE) => ({
+        value: cidadeIBGE.nome,
+        label: cidadeIBGE.nome,
+      }));
+      setCidadesList(cidadesFormatadas);
+    } catch (error) {
+      console.error('Erro ao buscar cidades:', error);
+    }
+  };
+
+  const handleOnEstadoChange = (value) => {
+    setRegisterDevice({ ...registerDevice, uf: value, city: '' });
+    fetchCidades(value);
+  };
+
   const handleSubmit = async () => {
     if (
       !registerDevice.name ||
       !registerDevice.category ||
       !registerDevice.conservationState ||
-      !registerDevice.description
+      !registerDevice.description ||
+      !registerDevice.city ||
+      !registerDevice.uf
     ) {
       message.error('Por favor, preencha todos os campos obrigatórios!');
       return;
@@ -308,19 +338,7 @@ export function TelaDoador() {
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'white',
-          padding: '0 50px',
-          borderBottom: '1px solid #f0f0f0',
-        }}
-      >
-        <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
-          Electronic Donation
-        </Title>
+      <GlobalHeader>
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
@@ -328,7 +346,7 @@ export function TelaDoador() {
         >
           Voltar para Home
         </Button>
-      </Header>
+      </GlobalHeader>
       <Container>
         <Title level={2} style={{ color: '#343a40', margin: 0 }}>
           Área do Doador
@@ -395,11 +413,7 @@ export function TelaDoador() {
                   onChange={(value) =>
                     setRegisterDevice({ ...registerDevice, category: value })
                   }
-                  options={[
-                    { value: 'notebook', label: 'notebook' },
-                    { value: 'smartphone', label: 'smartphone' },
-                    { value: 'tablet', label: 'tablet' },
-                  ]}
+                  options={DEVICE_CATEGORY}
                 />
               </div>
 
@@ -425,17 +439,50 @@ export function TelaDoador() {
                       conservationState: value,
                     })
                   }
-                  options={[
-                    { value: 'Novo', label: 'Novo' },
-                    {
-                      value: 'Usado - em bom estado',
-                      label: 'Usado - em bom estado',
-                    },
-                    {
-                      value: 'Usado - com defeito',
-                      label: 'Usado - com defeito',
-                    },
-                  ]}
+                  options={DEVICE_STATUS}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  UF: <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione o estado"
+                  value={registerDevice.uf}
+                  onChange={(value) => handleOnEstadoChange(value)}
+                  options={UF}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Cidade: <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione a cidade"
+                  value={registerDevice.city}
+                  onChange={(value) =>
+                    setRegisterDevice({ ...registerDevice, city: value })
+                  }
+                  options={cidadesList}
+                  disabled={cidadesList.length === 0}
                 />
               </div>
 
@@ -507,18 +554,9 @@ export function TelaDoador() {
                   <List.Item
                     actions={[
                       <Button
-                        type="default"
+                        type="link"
                         size="small"
                         onClick={() => showDrawer(donation)}
-                        style={{
-                          border: 'none',
-                          boxShadow: 'none',
-                          backgroundColor: 'transparent',
-                          color:
-                            donation.status === 'Aceito'
-                              ? theme.colors.gray?.[500]
-                              : theme.colors.blue?.[500],
-                        }}
                         disabled={donation.status === 'Aceito'}
                       >
                         Editar

@@ -118,6 +118,9 @@ export function DeviceCardDetail({ device, onClose }) {
           <Descriptions.Item label="Doador" span={2}>
             {device.nome_usuario || 'Não informado'}
           </Descriptions.Item>
+          <Descriptions.Item label="Localização">
+            {device.cidade} - {device.uf}
+          </Descriptions.Item>
         </Descriptions>
 
         <Space vertical size="small" style={{ width: '100%' }}>

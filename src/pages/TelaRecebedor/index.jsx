@@ -19,6 +19,7 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { api } from '../../services/api';
 import { DeviceDetailsModal } from '../../components/DeviceDetailsModal';
+import { GlobalHeader } from '../../components/GlobalHeader';
 
 const { Title, Paragraph, Text } = Typography;
 const { Header } = Layout;
@@ -70,19 +71,7 @@ export function TelaRecebedor() {
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'white',
-          padding: '0 50px',
-          borderBottom: '1px solid #f0f0f0',
-        }}
-      >
-        <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
-          Electronic Donation
-        </Title>
+      <GlobalHeader>
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
@@ -90,7 +79,7 @@ export function TelaRecebedor() {
         >
           Voltar para Home
         </Button>
-      </Header>
+      </GlobalHeader>
       <Container>
         <Title level={2} style={{ color: '#343a40', margin: 0 }}>
           Área do Recebedor

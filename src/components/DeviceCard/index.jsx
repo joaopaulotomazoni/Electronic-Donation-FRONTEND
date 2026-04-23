@@ -44,6 +44,10 @@ export function DeviceCard({ device }) {
               <Text type="secondary">{device.categoria}</Text>
               <br />
               <Text>{device.estado_conservacao}</Text>
+              <br />
+              <Text>
+                {device.cidade} - {device.uf}
+              </Text>
             </>
           }
         />

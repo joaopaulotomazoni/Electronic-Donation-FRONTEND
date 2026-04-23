@@ -12,8 +12,15 @@ import {
   Space,
   List,
   Spin,
+  Dropdown,
+  Avatar,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, DownOutlined } from '@ant-design/icons';
+import { DEVICE_CATEGORY } from '../../constants/deviceCategory';
+import { DEVICE_STATUS } from '../../constants/deviceState';
+import { UF } from '../../constants/uf';
+import { useTheme } from 'styled-components';
+import { GlobalHeader } from '../../components/GlobalHeader';
 
 const { Header, Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -23,13 +30,69 @@ export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { isAuthenticated, signOut, user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [cidadesList, setCidadesList] = useState([]);
+  const [selectedUf, setSelectedUf] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
 
   const navigate = useNavigate();
+  const theme = useTheme();
 
   function handleSignOut() {
     signOut();
-    navigate('/login');
   }
+
+  const userMenuItems = [
+    {
+      key: 'editar_perfil',
+      label: 'Editar perfil',
+      onClick: () => navigate('/perfil'),
+    },
+    {
+      key: 'doador',
+      label: 'Tela do doador',
+      onClick: () => navigate('/doador'),
+    },
+    {
+      key: 'recebedor',
+      label: 'Tela do recebedor',
+      onClick: () => navigate('/recebedor'),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'sair',
+      label: 'Sair',
+      danger: true,
+      onClick: handleSignOut,
+    },
+  ];
+
+  const fetchCidades = async (uf) => {
+    if (!uf) {
+      setCidadesList([]);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+      );
+      const data = await response.json();
+      const cidadesFormatadas = data.map((cidadeIBGE) => ({
+        value: cidadeIBGE.nome,
+        label: cidadeIBGE.nome,
+      }));
+      setCidadesList(cidadesFormatadas);
+    } catch (error) {
+      console.error('Erro ao buscar cidades:', error);
+    }
+  };
+
+  const handleOnEstadoChange = (value) => {
+    setSelectedUf(value);
+    setSelectedCity('');
+    fetchCidades(value);
+  };
 
   useEffect(() => {
     async function fetchDevices() {
@@ -40,6 +103,8 @@ export const Home = () => {
             userId: user?.id,
           },
         });
+
+        console.log({ response: response.data });
 
         setDevices(response.data);
       } catch (error) {
@@ -54,41 +119,47 @@ export const Home = () => {
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'white',
-          padding: '0 50px',
-          borderBottom: '1px solid #f0f0f0',
-        }}
-      >
-        <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
-          Electronic Donation
-        </Title>
-        <Space>
-          {isAuthenticated && (
-            <>
-              <Button onClick={() => navigate('/doador')}>
-                Tela do doador
+      <GlobalHeader>
+        {isAuthenticated ? (
+          <>
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <Button
+                type="text"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  height: '64px',
+                  borderRadius: 0,
+                  padding: '0 50px 0 24px',
+                  marginRight: '-50px',
+                }}
+              >
+                <Avatar
+                  size="small"
+                  src={user?.foto}
+                  style={{ backgroundColor: '#1890ff' }}
+                >
+                  {user?.nome?.charAt(0)?.toUpperCase() ||
+                    user?.name?.charAt(0)?.toUpperCase() ||
+                    'U'}
+                </Avatar>
+                Bem vindo(a) {user.nome}!
+                <DownOutlined />
               </Button>
-              <Button onClick={() => navigate('/recebedor')}>
-                Tela do recebedor
-              </Button>
-            </>
-          )}
-          {isAuthenticated ? (
-            <Button type="primary" danger onClick={handleSignOut}>
-              Sair
-            </Button>
-          ) : (
+            </Dropdown>
+          </>
+        ) : (
+          <>
             <Button type="primary" onClick={() => navigate('/login')}>
-              Entrar
+              Login
             </Button>
-          )}
-        </Space>
-      </Header>
+            <Button type="default" onClick={() => navigate('/signup')}>
+              Registrar-se
+            </Button>
+          </>
+        )}
+      </GlobalHeader>
       <Content style={{ padding: '0 50px', marginTop: 24 }}>
         <div
           style={{
@@ -120,9 +191,53 @@ export const Home = () => {
             />
             <Select placeholder="Categoria" style={{ width: 150 }}>
               <Option value="">Todas</Option>
+              {DEVICE_CATEGORY.map((categoria) => (
+                <Option key={categoria.value} value={categoria.value}>
+                  {categoria.label}
+                </Option>
+              ))}
             </Select>
-            <Select placeholder="Estado" style={{ width: 150 }}>
+            <Select placeholder="Estado de conservação" style={{ width: 200 }}>
               <Option value="">Todos</Option>
+              {DEVICE_STATUS.map((status) => (
+                <Option key={status.value} value={status.value}>
+                  {status.label}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="UF"
+              style={{ width: 100 }}
+              value={selectedUf}
+              onChange={handleOnEstadoChange}
+            >
+              <Option value="">Todos</Option>
+              {UF.map((estado) => (
+                <Option key={estado.value} value={estado.value}>
+                  {estado.label}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Cidade"
+              style={{
+                width: 150,
+                backgroundColor:
+                  cidadesList.length === 0
+                    ? theme?.colors?.gray?.[100]
+                    : theme?.colors?.white,
+              }}
+              value={selectedCity || undefined}
+              onChange={(value) => setSelectedCity(value)}
+              disabled={cidadesList.length === 0}
+              showSearch
+            >
+              <Option value="">Todas</Option>
+              {cidadesList.map((cidade) => (
+                <Option key={cidade.value} value={cidade.value}>
+                  {cidade.label}
+                </Option>
+              ))}
             </Select>
             <Button type="primary" icon={<SearchOutlined />} />
           </Space>
