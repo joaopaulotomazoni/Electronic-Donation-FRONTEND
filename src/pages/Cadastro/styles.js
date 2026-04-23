@@ -1,14 +1,14 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   background-color: ${({ theme }) => theme.colors.gray[50]};
 `;
 
 export const FormContainer = styled.div`
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   padding: 2rem;

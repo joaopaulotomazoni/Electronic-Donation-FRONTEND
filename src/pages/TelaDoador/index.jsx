@@ -21,6 +21,7 @@ import {
 import { InboxOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { api } from '../../services/api';
 import { useTheme } from 'styled-components';
+import { UF } from '../../constants/uf';
 
 const { Title, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -46,9 +47,12 @@ export function TelaDoador() {
     category: null,
     conservationState: null,
     description: null,
+    uf: null,
+    city: null,
   });
   const [imagesToDelete, setImagesToDelete] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cidadesList, setCidadesList] = useState([]);
 
   const { user } = useAuth();
   const theme = useTheme();
@@ -120,6 +124,27 @@ export function TelaDoador() {
       setLoading(false);
     }
   }, [user.id]);
+
+  const fetchCidades = async (uf) => {
+    try {
+      const response = await fetch(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+      );
+      const data = await response.json();
+      const cidadesFormatadas = data.map((cidadeIBGE) => ({
+        value: cidadeIBGE.nome,
+        label: cidadeIBGE.nome,
+      }));
+      setCidadesList(cidadesFormatadas);
+    } catch (error) {
+      console.error('Erro ao buscar cidades:', error);
+    }
+  };
+
+  const handleOnEstadoChange = (value) => {
+    setRegisterDevice({ ...registerDevice, uf: value, city: '' });
+    fetchCidades(value);
+  };
 
   const handleSubmit = async () => {
     if (
@@ -436,6 +461,49 @@ export function TelaDoador() {
                       label: 'Usado - com defeito',
                     },
                   ]}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  UF: <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione o estado"
+                  value={registerDevice.uf}
+                  onChange={(value) => handleOnEstadoChange(value)}
+                  options={UF}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Cidade: <span style={{ color: '#ff4d4f' }}>*</span>
+                </label>
+                <Select
+                  size="large"
+                  style={{ width: '100%' }}
+                  placeholder="Selecione a cidade"
+                  value={registerDevice.city}
+                  onChange={(value) =>
+                    setRegisterDevice({ ...registerDevice, city: value })
+                  }
+                  options={cidadesList}
+                  disabled={cidadesList.length === 0}
                 />
               </div>
 
