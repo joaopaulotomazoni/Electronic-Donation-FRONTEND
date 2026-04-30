@@ -1,13 +1,4 @@
-import {
-  Layout,
-  Spin,
-  Button,
-  Input,
-  Typography,
-  message,
-  notification,
-  Select,
-} from 'antd';
+import { Spin, Button, message, notification } from 'antd';
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -27,12 +18,19 @@ import {
   Container,
   FormContainer,
   LinkContainer,
+  LayoutContainer,
+  HeaderContainer,
+  TitleContainer,
+  Subtitle,
+  InputWrapper,
+  InputRow,
+  StyledInput,
+  StyledPassword,
+  StyledSelect,
+  SubmitButton,
 } from './styles';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTheme } from 'styled-components';
-
-const { Title, Text } = Typography;
 
 export const Cadastro = () => {
   const [email, setEmail] = useState('');
@@ -59,7 +57,6 @@ export const Cadastro = () => {
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const fetchCidades = async (uf) => {
     try {
@@ -208,9 +205,7 @@ export const Cadastro = () => {
   }
 
   return (
-    <Layout
-      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
-    >
+    <LayoutContainer>
       <ContentContainer>
         <GlobalHeader>
           <Button
@@ -224,40 +219,23 @@ export const Cadastro = () => {
         <Container>
           <Spin spinning={loading} description="Criando conta..." size="large">
             <FormContainer>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <Title
-                  level={2}
-                  style={{ color: theme.colors.blue[500], marginBottom: 4 }}
-                >
-                  Criar Conta
-                </Title>
-                <Text type="secondary">
-                  Preencha os dados abaixo para se cadastrar
-                </Text>
-              </div>
+              <HeaderContainer>
+                <TitleContainer level={2}>Criar Conta</TitleContainer>
+                <Subtitle>Preencha os dados abaixo para se cadastrar</Subtitle>
+              </HeaderContainer>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                }}
-              >
-                <Input
+              <InputWrapper>
+                <StyledInput
                   size="large"
-                  prefix={
-                    <UserOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<UserOutlined />}
                   placeholder="Nome completo"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
 
-                <Input
+                <StyledInput
                   size="large"
-                  prefix={
-                    <IdcardOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<IdcardOutlined />}
                   placeholder="CPF / CNPJ"
                   maxLength={18}
                   value={cpfOrCnpj}
@@ -281,13 +259,9 @@ export const Cadastro = () => {
                   }}
                 />
 
-                <Input
+                <StyledInput
                   size="large"
-                  prefix={
-                    <EnvironmentOutlined
-                      style={{ color: theme.colors.gray[400] }}
-                    />
-                  }
+                  prefix={<EnvironmentOutlined />}
                   placeholder="CEP"
                   maxLength={9}
                   value={cep}
@@ -301,10 +275,10 @@ export const Cadastro = () => {
                   onBlur={handleCepBlur}
                 />
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <Select
+                <InputRow>
+                  <StyledSelect
+                    $weight={1}
                     size="large"
-                    style={{ flex: 1 }}
                     placeholder="Estado"
                     value={estado || undefined}
                     onChange={handleOnEstadoChange}
@@ -312,9 +286,9 @@ export const Cadastro = () => {
                     disabled={disabledFields.estado}
                     showSearch
                   />
-                  <Select
+                  <StyledSelect
+                    $weight={2}
                     size="large"
-                    style={{ flex: 2 }}
                     placeholder="Cidade"
                     value={cidade || undefined}
                     onChange={(value) => setCidade(value)}
@@ -322,101 +296,81 @@ export const Cadastro = () => {
                     disabled={disabledFields.cidade}
                     showSearch
                   />
-                </div>
+                </InputRow>
 
-                <Input
+                <StyledInput
                   size="large"
-                  prefix={
-                    <HomeOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<HomeOutlined />}
                   placeholder="Bairro"
                   value={bairro}
                   onChange={(e) => setBairro(e.target.value)}
                   disabled={disabledFields.bairro}
                 />
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <Input
+                <InputRow>
+                  <StyledInput
+                    $weight={2}
                     size="large"
-                    style={{ flex: 2 }}
-                    prefix={
-                      <HomeOutlined style={{ color: theme.colors.gray[400] }} />
-                    }
+                    prefix={<HomeOutlined />}
                     placeholder="Rua"
                     value={rua}
                     onChange={(e) => setRua(e.target.value)}
                     disabled={disabledFields.rua}
                   />
-                  <Input
+                  <StyledInput
+                    $weight={1}
                     size="large"
-                    style={{ flex: 1 }}
-                    prefix={
-                      <NumberOutlined
-                        style={{ color: theme.colors.gray[400] }}
-                      />
-                    }
+                    prefix={<NumberOutlined />}
                     placeholder="Número"
                     value={numero}
                     onChange={(e) =>
                       setNumero(e.target.value.replace(/\D/g, ''))
                     }
                   />
-                </div>
+                </InputRow>
 
-                <Input
+                <StyledInput
                   size="large"
-                  prefix={
-                    <HomeOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<HomeOutlined />}
                   placeholder="Complemento (Opcional)"
                   value={complemento}
                   onChange={(e) => setComplemento(e.target.value)}
                 />
 
-                <Input
+                <StyledInput
                   size="large"
-                  prefix={
-                    <MailOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<MailOutlined />}
                   placeholder="E-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
 
-                <Input.Password
+                <StyledPassword
                   size="large"
-                  prefix={
-                    <LockOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<LockOutlined />}
                   placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <Input.Password
+                <StyledPassword
                   size="large"
-                  prefix={
-                    <LockOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<LockOutlined />}
                   placeholder="Confirmar senha"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
 
-                <Button
+                <SubmitButton
                   type="primary"
                   size="large"
                   block
                   loading={loading}
                   onClick={handleSubmit}
-                  style={{
-                    marginTop: '0.5rem',
-                    backgroundColor: theme.colors.blue[500],
-                  }}
                 >
                   Cadastrar
-                </Button>
-              </div>
+                </SubmitButton>
+              </InputWrapper>
 
               <LinkContainer>
                 Já possui conta? <Link to="/login">Fazer login</Link>
@@ -425,6 +379,6 @@ export const Cadastro = () => {
           </Spin>
         </Container>
       </ContentContainer>
-    </Layout>
+    </LayoutContainer>
   );
 };

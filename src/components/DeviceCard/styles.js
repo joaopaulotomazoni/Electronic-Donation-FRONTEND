@@ -1,81 +1,107 @@
 import styled from 'styled-components';
+import { Card, Button, Typography, Tag } from 'antd';
 
-export const CardContainer = styled.div`
-  max-width: 350px;
-  width: 100%;
-  background-color: #ffffff;
+const { Title, Text } = Typography;
+
+export const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  margin: 20px auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+  height: 100%;
+  width: 344px;
+  max-width: 344px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 
-  .deviceImg img {
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .ant-card-cover {
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .ant-card-body {
+    padding: 16px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ant-card-actions {
+    border-top: 1px solid ${({ theme }) => theme.colors.gray[100]};
+    background-color: ${({ theme }) => theme.colors.white};
+    padding: 8px;
+
+    li {
+      margin: 0;
+    }
+  }
+`;
+
+export const DeviceImage = styled.img`
+  && {
     width: 100%;
-    height: 240px;
-    object-fit: cover;
+    height: 200px;
+    object-fit: contain;
+    background-color: ${({ theme }) => theme.colors.gray[50]};
     display: block;
   }
+`;
 
-  .deviceInfo {
-    padding: 20px 20px 10px 20px;
-  }
+export const TagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+`;
 
-  .deviceInfo h3 {
-    margin: 0 0 12px 0;
-    font-size: 1.25rem;
-    color: #111827;
-    font-weight: 600;
-  }
+export const LocationContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  margin-top: auto;
+  padding-top: 16px;
+  color: ${({ theme }) => theme.colors.gray[500]};
+`;
 
-  .deviceInfo p {
-    display: inline-block;
-    margin: 0 10px 15px 0;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  /* Estilo da primeira tag (Categoria: "Notebook") */
-  .deviceInfo p:nth-of-type(1) {
-    background-color: #ffffff;
-    color: #111827;
-    border: 1px solid #d1d5db;
-  }
-
-  /* Estilo da segunda tag (Uso: "Usado - Bom Estado") */
-  .deviceInfo p:nth-of-type(2) {
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: 1px solid #3b82f6;
-  }
-
-  .deviceInfo h4 {
-    margin: 5px 0 10px 0;
-    color: #6b7280;
-    font-size: 0.95rem;
-    font-weight: 400;
-  }
-
-  .deviceOverlay {
-    padding: 0 20px 20px 20px;
-  }
-
-  .deviceDonation-btn {
-    width: 100%;
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: none;
+export const ActionButton = styled(Button)`
+  && {
+    width: 90%;
     border-radius: 8px;
-    padding: 14px 0;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+    background-color: ${({ theme }) => theme.colors.blue[500]};
   }
+`;
 
-  .deviceDonation-btn:hover {
-    background-color: #2563eb;
+export const DeviceTitle = styled(Title)`
+  && {
+    margin: 0;
+    color: ${({ theme }) => theme.colors.gray[800]};
   }
+`;
+
+export const CategoryTag = styled(Tag)`
+  color: ${({ theme }) => theme.colors.gray[700]};
+  border-color: ${({ theme }) => theme.colors.gray[300]};
+  margin: 0;
+`;
+
+export const StateTag = styled(Tag)`
+  background-color: ${({ theme }) => theme.colors.blue[500]};
+  color: ${({ theme }) => theme.colors.white};
+  border: none;
+  margin: 0;
+`;
+
+export const LocationText = styled(Text)`
+  font-size: 13px;
+  margin: 0;
 `;

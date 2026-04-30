@@ -5,20 +5,26 @@ import {
   ContentContainer,
   FormContainer,
   LinkContainer,
+  LayoutContainer,
+  HeaderContainer,
+  TitleContainer,
+  Subtitle,
+  InputWrapper,
+  StyledInput,
+  StyledPassword,
+  SubmitButton,
+  RecoverPasswordContainer,
 } from './styles';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTheme } from 'styled-components';
 
-import { Layout, Spin, Button, Input, Typography, message } from 'antd';
+import { Spin, Button, message } from 'antd';
 import {
   ArrowLeftOutlined,
   MailOutlined,
   LockOutlined,
 } from '@ant-design/icons';
 import { GlobalHeader } from '../../components/GlobalHeader';
-
-const { Title, Text } = Typography;
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +33,6 @@ export const Login = () => {
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const theme = useTheme();
 
   async function handleSubmit() {
     if (!email || !password) {
@@ -58,9 +63,7 @@ export const Login = () => {
   }
 
   return (
-    <Layout
-      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
-    >
+    <LayoutContainer>
       <ContentContainer>
         <GlobalHeader>
           <Button
@@ -74,59 +77,42 @@ export const Login = () => {
         <Container>
           <Spin spinning={loading} description="Autenticando..." size="large">
             <FormContainer>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <Title
-                  level={2}
-                  style={{ color: theme.colors.blue[500], marginBottom: 4 }}
-                >
-                  Bem-vindo
-                </Title>
-                <Text type="secondary">
-                  Faça login na sua conta para continuar
-                </Text>
-              </div>
+              <HeaderContainer>
+                <TitleContainer level={2}>Bem-vindo</TitleContainer>
+                <Subtitle>Faça login na sua conta para continuar</Subtitle>
+              </HeaderContainer>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                }}
-              >
-                <Input
+              <InputWrapper>
+                <StyledInput
                   size="large"
-                  prefix={
-                    <MailOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<MailOutlined />}
                   placeholder="E-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
 
-                <Input.Password
+                <StyledPassword
                   size="large"
-                  prefix={
-                    <LockOutlined style={{ color: theme.colors.gray[400] }} />
-                  }
+                  prefix={<LockOutlined />}
                   placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <Button
+                <RecoverPasswordContainer>
+                  <Link to="/recuperar-senha">Esqueceu sua senha?</Link>
+                </RecoverPasswordContainer>
+
+                <SubmitButton
                   type="primary"
                   size="large"
                   block
                   loading={loading}
                   onClick={handleSubmit}
-                  style={{
-                    marginTop: '0.5rem',
-                    backgroundColor: theme.colors.blue[500],
-                  }}
                 >
                   Entrar
-                </Button>
-              </div>
+                </SubmitButton>
+              </InputWrapper>
 
               <LinkContainer>
                 Ainda não possui conta? <Link to="/signup">Criar conta</Link>
@@ -135,6 +121,6 @@ export const Login = () => {
           </Spin>
         </Container>
       </ContentContainer>
-    </Layout>
+    </LayoutContainer>
   );
 };

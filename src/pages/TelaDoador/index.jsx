@@ -1,34 +1,43 @@
 import { EditarDoacoes } from './EditarDoacoes/index';
-import { Container, Content } from './styles';
+import {
+  LayoutContainer,
+  Container,
+  HeaderContainer,
+  PageTitle,
+  PageSubtitle,
+  Content,
+  StyledCard,
+  FormRow,
+  FormLabel,
+  RequiredAsterisk,
+  DeviceImagePreview,
+  ListTitle,
+  InfoText,
+} from './styles';
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography,
-  Form,
   Input,
   Select,
   Button,
   Upload,
   List,
-  Card,
   Tag,
   Space,
   message,
-  Layout,
   Spin,
 } from 'antd';
 import { InboxOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { api } from '../../services/api';
-import { useTheme } from 'styled-components';
 import { UF } from '../../constants/uf';
 import { DEVICE_STATUS } from '../../constants/deviceState';
 import { DEVICE_CATEGORY } from '../../constants/deviceCategory';
 import { GlobalHeader } from '../../components/GlobalHeader';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const { Dragger } = Upload;
-const { Header } = Layout;
 
 export function TelaDoador() {
   const navigate = useNavigate();
@@ -58,7 +67,6 @@ export function TelaDoador() {
   const [cidadesList, setCidadesList] = useState([]);
 
   const { user } = useAuth();
-  const theme = useTheme();
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -337,51 +345,38 @@ export function TelaDoador() {
   }, [fetchDevices, user]);
 
   return (
-    <Layout style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <LayoutContainer>
       <GlobalHeader>
         <Button
+          type="link"
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
-          style={{ border: 0, boxShadow: 'none' }}
         >
           Voltar para Home
         </Button>
       </GlobalHeader>
       <Container>
-        <Title level={2} style={{ color: '#343a40', margin: 0 }}>
-          Área do Doador
-        </Title>
-        <Paragraph
-          style={{
-            color: '#6c757d',
-            marginTop: '0.5rem',
-            marginBottom: '2.5rem',
-          }}
-        >
-          Cadastre seus dispositivos e ajude quem precisa
-        </Paragraph>
+        <HeaderContainer>
+          <PageTitle level={2}>Área do Doador</PageTitle>
+          <PageSubtitle>
+            Cadastre seus dispositivos e ajude quem precisa
+          </PageSubtitle>
+        </HeaderContainer>
 
         <Content>
-          <Card
+          <StyledCard
             title={
               <Title level={4} style={{ margin: 0 }}>
                 Cadastrar Nova Doação
               </Title>
             }
-            style={{ borderRadius: 8, height: 'fit-content' }}
+            style={{ height: 'fit-content' }}
           >
             <Spin spinning={loading} description="Carregando...">
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Nome do Dispositivo{' '}
-                  <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  Nome do Dispositivo <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Input
                   size="large"
                   placeholder="Ex: Notebook Dell Inspiron 15"
@@ -393,18 +388,12 @@ export function TelaDoador() {
                     })
                   }
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Categoria <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  Categoria <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Select
                   size="large"
                   style={{ width: '100%' }}
@@ -415,19 +404,12 @@ export function TelaDoador() {
                   }
                   options={DEVICE_CATEGORY}
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Estado de Conservação{' '}
-                  <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  Estado de Conservação <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Select
                   size="large"
                   style={{ width: '100%' }}
@@ -441,18 +423,12 @@ export function TelaDoador() {
                   }
                   options={DEVICE_STATUS}
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  UF: <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  UF: <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Select
                   size="large"
                   style={{ width: '100%' }}
@@ -461,18 +437,12 @@ export function TelaDoador() {
                   onChange={(value) => handleOnEstadoChange(value)}
                   options={UF}
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Cidade: <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  Cidade: <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Select
                   size="large"
                   style={{ width: '100%' }}
@@ -484,18 +454,12 @@ export function TelaDoador() {
                   options={cidadesList}
                   disabled={cidadesList.length === 0}
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Descrição <span style={{ color: '#ff4d4f' }}>*</span>
-                </label>
+              <FormRow>
+                <FormLabel>
+                  Descrição <RequiredAsterisk>*</RequiredAsterisk>
+                </FormLabel>
                 <Input.TextArea
                   rows={4}
                   placeholder="Descreva o dispositivo, especificações técnicas, acessórios incluídos..."
@@ -507,18 +471,10 @@ export function TelaDoador() {
                     })
                   }
                 />
-              </div>
+              </FormRow>
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Imagens do Dispositivo
-                </label>
+              <FormRow>
+                <FormLabel>Imagens do Dispositivo</FormLabel>
                 <Dragger {...uploadProps}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined />
@@ -527,7 +483,7 @@ export function TelaDoador() {
                     Clique para fazer upload ou arraste as imagens
                   </p>
                 </Dragger>
-              </div>
+              </FormRow>
 
               <div style={{ marginTop: '2rem' }}>
                 <Button type="primary" size="large" onClick={handleSubmit}>
@@ -535,16 +491,16 @@ export function TelaDoador() {
                 </Button>
               </div>
             </Spin>
-          </Card>
+          </StyledCard>
 
           <Space vertical size="large" style={{ display: 'flex' }}>
-            <Card
+            <StyledCard
               title={
                 <Title level={4} style={{ margin: 0 }}>
                   Minhas Doações
                 </Title>
               }
-              style={{ borderRadius: 8, width: '100%', minWidth: 400 }}
+              style={{ width: '100%', minWidth: 400 }}
             >
               <List
                 loading={loading}
@@ -565,27 +521,16 @@ export function TelaDoador() {
                   >
                     <List.Item.Meta
                       avatar={
-                        <img
+                        <DeviceImagePreview
                           src={
                             donation.imagens && donation.imagens.length > 0
                               ? donation.imagens[0].url
                               : 'https://via.placeholder.com/60x60/E9ECEF/868E96.png?text=IMG'
                           }
                           alt={donation.nome_dispositivo}
-                          style={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: 8,
-                            objectFit: 'cover',
-                            border: '1px solid #dee2e6',
-                          }}
                         />
                       }
-                      title={
-                        <span style={{ fontWeight: 600 }}>
-                          {donation.nome_dispositivo}
-                        </span>
-                      }
+                      title={<ListTitle>{donation.nome_dispositivo}</ListTitle>}
                       description={
                         <Tag color={getStatusColor(donation.status)}>
                           {donation.status}
@@ -595,15 +540,15 @@ export function TelaDoador() {
                   </List.Item>
                 )}
               />
-            </Card>
+            </StyledCard>
 
-            <Card
+            <StyledCard
               title={
                 <Title level={4} style={{ margin: 0 }}>
                   Solicitações Recebidas
                 </Title>
               }
-              style={{ borderRadius: 8, width: '100%', minWidth: 400 }}
+              style={{ width: '100%', minWidth: 400 }}
             >
               <List
                 loading={loading}
@@ -634,27 +579,27 @@ export function TelaDoador() {
                   >
                     <List.Item.Meta
                       title={
-                        <span style={{ fontWeight: 600 }}>
+                        <ListTitle>
                           {req.dispositivo?.nome_dispositivo ||
                             'Dispositivo Solicitado'}
-                        </span>
+                        </ListTitle>
                       }
                       description={
                         <>
-                          <div>
+                          <InfoText>
                             <strong>Justificativa:</strong>{' '}
                             {req.justificativa || 'Não informada.'}
-                          </div>
-                          <div>
+                          </InfoText>
+                          <InfoText>
                             <strong>Status:</strong> {req.status || 'Pendente'}
-                          </div>
+                          </InfoText>
                         </>
                       }
                     />
                   </List.Item>
                 )}
               />
-            </Card>
+            </StyledCard>
           </Space>
         </Content>
         <EditarDoacoes
@@ -668,6 +613,6 @@ export function TelaDoador() {
           loading={loading}
         />
       </Container>
-    </Layout>
+    </LayoutContainer>
   );
 }

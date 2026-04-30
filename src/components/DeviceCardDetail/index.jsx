@@ -1,23 +1,26 @@
-import {
-  Typography,
-  Image,
-  Descriptions,
-  Input,
-  Button,
-  Space,
-  message,
-  Spin,
-} from 'antd';
+import { Image, Descriptions, Input, Button, message, Spin } from 'antd';
 import { useState } from 'react';
+import { useTheme } from 'styled-components';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
+import {
+  DetailContainer,
+  HeaderSection,
+  DeviceTitle,
+  Subtitle,
+  ImageGallery,
+  StyledImage,
+  SectionContainer,
+  SectionTitle,
+  DescriptionBox,
+} from './styles';
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export function DeviceCardDetail({ device, onClose }) {
   const [justificativa, setJustificativa] = useState('');
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
   const { user } = useAuth();
 
@@ -45,70 +48,46 @@ export function DeviceCardDetail({ device, onClose }) {
   }
 
   return (
-    <Spin spinning={loading} description="Enviando solicitação...">
-      <Space vertical size="middle" style={{ width: '100%', display: 'flex' }}>
-        <div>
-          <Title level={3} style={{ margin: 0 }}>
-            {device.nome_dispositivo}
-          </Title>
-          <Text type="secondary">
+    <Spin spinning={loading} description="Enviando solicitação..." size="large">
+      <DetailContainer>
+        <HeaderSection>
+          <DeviceTitle level={3}>{device.nome_dispositivo}</DeviceTitle>
+          <Subtitle>
             Solicite este dispositivo e justifique sua necessidade
-          </Text>
-        </div>
+          </Subtitle>
+        </HeaderSection>
 
-        <div
-          style={{
-            display: 'flex',
-            overflowX: 'auto',
-            gap: '16px',
-            paddingBottom: '8px',
-            justifyContent:
-              device.imagens && device.imagens.length > 1
-                ? 'flex-start'
-                : 'center',
-          }}
-        >
+        <ImageGallery $isSingle={!device.imagens || device.imagens.length <= 1}>
           <Image.PreviewGroup>
             {device.imagens && device.imagens.length > 0 ? (
               device.imagens.map((img, index) => (
                 <div key={index} style={{ flexShrink: 0 }}>
-                  <Image
+                  <StyledImage
                     src={img.url}
                     alt={`Imagem ${index + 1} de ${device.nome_dispositivo}`}
-                    style={{
-                      width: 250,
-                      height: 250,
-                      objectFit: 'cover',
-                      borderRadius: 8,
-                    }}
+                    width={250}
+                    height={250}
+                    style={{ objectFit: 'cover' }}
                   />
                 </div>
               ))
             ) : (
               <div style={{ flexShrink: 0 }}>
-                <Image
+                <StyledImage
                   src={
                     'https://via.placeholder.com/250x250/E9ECEF/868E96.png?text=Sem+Imagem'
                   }
                   alt={`Imagem de ${device.nome_dispositivo}`}
-                  style={{
-                    width: 250,
-                    height: 250,
-                    objectFit: 'cover',
-                    borderRadius: 8,
-                  }}
+                  width={250}
+                  height={250}
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
             )}
           </Image.PreviewGroup>
-        </div>
+        </ImageGallery>
 
-        <Descriptions
-          bordered
-          column={2}
-          size="small"
-          style={{ tableLayout: 'fixed' }}
-        >
+        <Descriptions bordered column={2} size="small">
           <Descriptions.Item label="Categoria">
             {device.categoria}
           </Descriptions.Item>
@@ -118,48 +97,50 @@ export function DeviceCardDetail({ device, onClose }) {
           <Descriptions.Item label="Doador" span={2}>
             {device.nome_usuario || 'Não informado'}
           </Descriptions.Item>
-          <Descriptions.Item label="Localização">
+          <Descriptions.Item label="Localização" span={2}>
             {device.cidade} - {device.uf}
           </Descriptions.Item>
         </Descriptions>
 
-        <Space vertical size="small" style={{ width: '100%' }}>
-          <Text strong>Descrição do Dispositivo</Text>
-          <div
-            style={{
-              minHeight: '80px',
-              maxHeight: '120px',
-              overflowY: 'auto',
-              padding: '12px',
-              backgroundColor: '#fafafa',
-              border: '1px solid #d9d9d9',
-              borderRadius: '6px',
-            }}
-          >
-            <Text>{device.descricao || 'Nenhuma descrição fornecida.'}</Text>
-          </div>
-        </Space>
+        <SectionContainer>
+          <SectionTitle>Descrição do Dispositivo</SectionTitle>
+          <DescriptionBox>
+            {device.descricao || 'Nenhuma descrição fornecida.'}
+          </DescriptionBox>
+        </SectionContainer>
 
-        <Space vertical size="small" style={{ width: '100%' }}>
-          <Text strong>Justificativa do Pedido</Text>
+        <SectionContainer>
+          <SectionTitle>Justificativa do Pedido</SectionTitle>
           <TextArea
             placeholder="Explique por que você precisa deste dispositivo e como ele será útil para você..."
             rows={4}
-            style={{ resize: 'none' }}
+            style={{ resize: 'none', borderRadius: '8px' }}
             value={justificativa}
             onChange={(e) => setJustificativa(e.target.value)}
           />
-        </Space>
+        </SectionContainer>
 
-        <Space
-          style={{ width: '100%', justifyContent: 'flex-end', marginTop: 8 }}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            marginTop: '8px',
+          }}
         >
-          <Button onClick={onClose}>Cancelar</Button>
-          <Button type="primary" onClick={sendDeviceRequest}>
+          <Button size="large" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            onClick={sendDeviceRequest}
+            style={{ backgroundColor: theme.colors.blue[500] }}
+          >
             Enviar Solicitação
           </Button>
-        </Space>
-      </Space>
+        </div>
+      </DetailContainer>
     </Spin>
   );
 }

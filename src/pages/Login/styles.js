@@ -1,4 +1,13 @@
 import styled from 'styled-components';
+import { Layout, Typography, Button, Input } from 'antd';
+
+const { Title, Text } = Typography;
+
+export const LayoutContainer = styled(Layout)`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
 
 export const ContentContainer = styled.div`
   display: flex;
@@ -34,6 +43,47 @@ export const FormContainer = styled.div`
   }
 `;
 
+export const HeaderContainer = styled.div`
+  text-align: center;
+  margin-bottom: 2rem;
+`;
+
+export const TitleContainer = styled(Title)`
+  && {
+    color: ${({ theme }) => theme.colors.blue[500]};
+    margin-bottom: 4px;
+  }
+`;
+
+export const Subtitle = styled(Text)`
+  color: ${({ theme }) => theme.colors.gray[500]};
+`;
+
+export const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+export const StyledInput = styled(Input)`
+  .anticon {
+    color: ${({ theme }) => theme.colors.gray[400]};
+  }
+`;
+
+export const StyledPassword = styled(Input.Password)`
+  .anticon {
+    color: ${({ theme }) => theme.colors.gray[400]};
+  }
+`;
+
+export const SubmitButton = styled(Button)`
+  && {
+    margin-top: 0.5rem;
+    background-color: ${({ theme }) => theme.colors.blue[500]};
+  }
+`;
+
 export const LinkContainer = styled.p`
   margin-top: 1.5rem;
   text-align: center;
@@ -48,4 +98,10 @@ export const LinkContainer = styled.p`
       text-decoration: underline;
     }
   }
+`;
+
+export const RecoverPasswordContainer = styled.div`
+  text-align: right;
+  width: 100%;
+  margin-top: -0.5rem;
 `;

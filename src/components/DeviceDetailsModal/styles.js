@@ -1,38 +1,22 @@
 import styled from 'styled-components';
-import { Typography, Image, Descriptions, Input } from 'antd';
+import { Typography, Image } from 'antd';
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography;
 
-export const DetailContainer = styled.div`
+export const ModalContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
   width: 100%;
 `;
 
-export const HeaderSection = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const DeviceTitle = styled(Title)`
-  && {
-    margin: 0;
-    color: ${({ theme }) => theme.colors.blue[500]};
-  }
-`;
-
-export const Subtitle = styled(Text)`
-  color: ${({ theme }) => theme.colors.gray[500]};
-`;
-
 export const ImageGallery = styled.div`
   display: flex;
   overflow-x: auto;
   gap: 16px;
-  padding-bottom: 12px;
-  justify-content: ${({ $isSingle }) => ($isSingle ? 'center' : 'flex-start')};
+  padding: 8px 0;
+  justify-content: ${({ $isCentered }) =>
+    $isCentered ? 'center' : 'flex-start'};
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -65,16 +49,15 @@ export const SectionContainer = styled.div`
 export const SectionTitle = styled(Text)`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.gray[800]};
-  font-size: 16px;
 `;
 
 export const DescriptionBox = styled.div`
   min-height: 80px;
-  max-height: 150px;
+  max-height: 120px;
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
   background-color: ${({ theme }) => theme.colors.gray[50]};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: 8px;
+  border-radius: 6px;
   color: ${({ theme }) => theme.colors.gray[700]};
 `;
