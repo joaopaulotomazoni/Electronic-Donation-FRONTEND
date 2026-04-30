@@ -1,28 +1,24 @@
 import { useEffect, useState } from 'react';
-import { Container, Content } from './styles';
+import {
+  LayoutContainer,
+  Container,
+  HeaderContainer,
+  PageTitle,
+  PageSubtitle,
+  Content,
+  StyledCard,
+  DeviceImagePreview,
+  ListTitle,
+} from './styles';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import {
-  Typography,
-  List,
-  Card,
-  Tag,
-  Button,
-  Layout,
-  message,
-  Spin,
-  Modal,
-  Image,
-  Descriptions,
-  Space,
-} from 'antd';
+import { Typography, List, Tag, Button, message, Spin, Modal } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { api } from '../../services/api';
 import { DeviceDetailsModal } from '../../components/DeviceDetailsModal';
 import { GlobalHeader } from '../../components/GlobalHeader';
 
-const { Title, Paragraph, Text } = Typography;
-const { Header } = Layout;
+const { Title } = Typography;
 
 export function TelaRecebedor() {
   const navigate = useNavigate();
@@ -70,38 +66,31 @@ export function TelaRecebedor() {
   }, [user]);
 
   return (
-    <Layout style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <LayoutContainer>
       <GlobalHeader>
         <Button
+          type="link"
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
-          style={{ border: 0, boxShadow: 'none' }}
         >
           Voltar para Home
         </Button>
       </GlobalHeader>
       <Container>
-        <Title level={2} style={{ color: '#343a40', margin: 0 }}>
-          Área do Recebedor
-        </Title>
-        <Paragraph
-          style={{
-            color: '#6c757d',
-            marginTop: '0.5rem',
-            marginBottom: '2.5rem',
-          }}
-        >
-          Acompanhe o status dos dispositivos que você solicitou.
-        </Paragraph>
+        <HeaderContainer>
+          <PageTitle level={2}>Área do Recebedor</PageTitle>
+          <PageSubtitle>
+            Acompanhe o status dos dispositivos que você solicitou.
+          </PageSubtitle>
+        </HeaderContainer>
 
         <Content>
-          <Card
+          <StyledCard
             title={
               <Title level={4} style={{ margin: 0 }}>
                 Minhas Solicitações
               </Title>
             }
-            style={{ borderRadius: 8 }}
           >
             <Spin
               spinning={loading}
@@ -115,7 +104,7 @@ export function TelaRecebedor() {
                   <List.Item>
                     <List.Item.Meta
                       avatar={
-                        <img
+                        <DeviceImagePreview
                           src={
                             item.dispositivos?.imagens &&
                             item.dispositivos.imagens.length > 0
@@ -125,19 +114,12 @@ export function TelaRecebedor() {
                           alt={
                             item.dispositivos?.nome_dispositivo || 'Dispositivo'
                           }
-                          style={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: 8,
-                            objectFit: 'cover',
-                            border: '1px solid #dee2e6',
-                          }}
                         />
                       }
                       title={
-                        <span style={{ fontWeight: 600 }}>
+                        <ListTitle>
                           {item.dispositivos?.nome_dispositivo || 'Dispositivo'}
-                        </span>
+                        </ListTitle>
                       }
                       description={
                         <Tag color={getStatusColor(item.status)}>
@@ -152,7 +134,7 @@ export function TelaRecebedor() {
                 )}
               />
             </Spin>
-          </Card>
+          </StyledCard>
         </Content>
         {selectedSolicitacao && (
           <Modal
@@ -173,6 +155,6 @@ export function TelaRecebedor() {
           </Modal>
         )}
       </Container>
-    </Layout>
+    </LayoutContainer>
   );
 }
