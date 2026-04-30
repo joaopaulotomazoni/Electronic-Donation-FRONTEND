@@ -1,64 +1,41 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+
+export const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.colors.gray[50]};
+  flex: 1;
+  width: 100%;
+  background: ${({ theme }) => theme.colors.gray[50]};
+  padding: 2rem;
 `;
 
 export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 2rem;
-  border-radius: 8px;
+  padding: 3rem 2.5rem;
+  border-radius: 16px;
   background-color: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.01),
+    0 20px 48px rgba(0, 0, 0, 0.01);
   width: 100%;
   max-width: 400px;
-
-  h2 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: ${({ theme }) => theme.colors.black};
-  }
-`;
-
-export const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-
-  label {
-    margin-bottom: 0.5rem;
-    color: ${({ theme }) => theme.colors.black};
-  }
-
-  input {
-    padding: 0.75rem;
-    border: 1px solid ${({ theme }) => theme.colors.gray[300]};
-    border-radius: 4px;
-  }
-`;
-
-export const Button = styled.button`
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  background-color: ${({ theme }) => theme.colors.blue[500]};
-  color: ${({ theme }) => theme.colors.white};
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s ease-in-out;
+  transition: transform 0.3s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.blue[600]};
+    transform: translateY(-5px);
   }
 `;
 
 export const LinkContainer = styled.p`
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: center;
   color: ${({ theme }) => theme.colors.gray[600]};
 

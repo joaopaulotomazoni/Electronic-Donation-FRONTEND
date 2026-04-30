@@ -1,16 +1,17 @@
-import { createContext, useState } from "react";
+import { createContext, useState } from 'react';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const storageUser = localStorage.getItem("@app:user");
+    const storageUser = localStorage.getItem('@app:user');
     if (storageUser) {
       try {
         return JSON.parse(storageUser);
       } catch (error) {
-        console.error("Erro ao fazer parse do usuário:", error);
-        localStorage.removeItem("@app:user");
+        console.error('Erro ao fazer parse do usuário:', error);
+        localStorage.removeItem('@app:user');
         return null;
       }
     }
@@ -27,12 +28,12 @@ export function AuthProvider({ children }) {
 
     setUser(userInfo);
 
-    localStorage.setItem("@app:user", JSON.stringify(userInfo));
+    localStorage.setItem('@app:user', JSON.stringify(userInfo));
   }
 
   function signOut() {
     setUser(null);
-    localStorage.removeItem("@app:user");
+    localStorage.removeItem('@app:user');
   }
 
   return (

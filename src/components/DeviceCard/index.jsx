@@ -1,6 +1,6 @@
-import { Card, Button, Modal, Typography } from "antd";
-import { useState } from "react";
-import { DeviceCardDetail } from "../DeviceCardDetail";
+import { Card, Button, Modal, Typography } from 'antd';
+import { useState } from 'react';
+import { DeviceCardDetail } from '../DeviceCardDetail';
 
 const { Meta } = Card;
 const { Text } = Typography;
@@ -20,12 +20,15 @@ export function DeviceCard({ device }) {
     <>
       <Card
         hoverable
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         cover={
           <img
-            alt={device.name}
-            src={device.url}
-            style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }}
+            alt={device.nome_dispositivo}
+            src={
+              device.imagens?.[0]?.url ||
+              'https://via.placeholder.com/300x200/E9ECEF/868E96.png?text=Sem+Imagem'
+            }
+            style={{ width: '100%', height: 200, objectFit: 'cover' }}
           />
         }
         actions={[
@@ -35,12 +38,16 @@ export function DeviceCard({ device }) {
         ]}
       >
         <Meta
-          title={device.name}
+          title={device.nome_dispositivo}
           description={
             <>
-              <Text type="secondary">{device.category}</Text>
+              <Text type="secondary">{device.categoria}</Text>
               <br />
-              <Text>{device.usage}</Text>
+              <Text>{device.estado_conservacao}</Text>
+              <br />
+              <Text>
+                {device.cidade} - {device.uf}
+              </Text>
             </>
           }
         />
