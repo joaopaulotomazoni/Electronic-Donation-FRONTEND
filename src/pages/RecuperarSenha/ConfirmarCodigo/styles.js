@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { Layout, Typography, Button } from 'antd';
+import { Layout, Typography, Button, Input } from 'antd';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 export const LayoutContainer = styled(Layout)`
   min-height: 100vh;
@@ -25,7 +25,7 @@ export const Container = styled.div`
   padding: 2rem;
 `;
 
-export const ProfileCard = styled.div`
+export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 3rem 2.5rem;
@@ -35,16 +35,11 @@ export const ProfileCard = styled.div`
     0 10px 25px rgba(0, 0, 0, 0.01),
     0 20px 48px rgba(0, 0, 0, 0.01);
   width: 100%;
-  max-width: 600px;
+  max-width: 400px;
   transition: transform 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-  }
-
-  .ant-form-item-label > label {
-    font-weight: 500;
-    color: ${({ theme }) => theme.colors.gray[700]};
   }
 `;
 
@@ -53,38 +48,48 @@ export const HeaderContainer = styled.div`
   margin-bottom: 2rem;
 `;
 
-export const PageTitle = styled(Title)`
+export const TitleContainer = styled(Title)`
   && {
     color: ${({ theme }) => theme.colors.blue[500]};
     margin-bottom: 4px;
   }
 `;
 
-export const AvatarContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-export const AvatarIconWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .anticon {
-    font-size: 32px;
-    color: ${({ theme }) => theme.colors.blue[500]};
-  }
-`;
-
-export const AvatarText = styled.div`
-  margin-top: 8px;
+export const Subtitle = styled(Text)`
   color: ${({ theme }) => theme.colors.gray[500]};
+`;
+
+export const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+export const StyledInput = styled(Input)`
+  .anticon {
+    color: ${({ theme }) => theme.colors.gray[400]};
+  }
 `;
 
 export const SubmitButton = styled(Button)`
   && {
+    margin-top: 0.5rem;
     background-color: ${({ theme }) => theme.colors.blue[500]};
+  }
+`;
+
+export const LinkContainer = styled.p`
+  margin-top: 1.5rem;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.gray[600]};
+
+  a {
+    color: ${({ theme }) => theme.colors.blue[500]};
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
