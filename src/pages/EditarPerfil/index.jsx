@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Upload, message, Spin } from 'antd';
-import { UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, Button, message, Spin } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useAuth } from '../../hooks/useAuth';
+import { useAddress } from '../../hooks/useAddress';
 import { api } from '../../services/api';
 import { GlobalHeader } from '../../components/GlobalHeader';
+import { AddressForm } from '../../components/AddressForm';
+import { AvatarUpload } from './components/AvatarUpload';
+import { PersonalFields } from './components/PersonalFields';
+import { ChangePasswordModal } from './components/ChangePasswordModal';
 import {
   LayoutContainer,
   ContentContainer,
@@ -12,44 +17,115 @@ import {
   ProfileCard,
   HeaderContainer,
   PageTitle,
-  AvatarContainer,
-  AvatarIconWrapper,
-  AvatarText,
   SubmitButton,
 } from './styles';
 
 export const EditarPerfil = () => {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
+  const { user, updateAvatar, updateUser } = useAuth();
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [personalData, setPersonalData] = useState({
+    nome: user?.nome || user?.name || '',
+    email: user?.email || '',
+  });
+
+  const [formPasswordData, setFormPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+
+  const { 
+    address, 
+    setAddress,
+    cidadesList, 
+    disabledFields, 
+    loading: loadingAddress, 
+    cepExist,
+    fetchAddressByCep,
+    handleEstadoChange,
+    updateAddressField,
+    setDisabledFields
+  } = useAddress();
+
   const navigate = useNavigate();
+  const loading = loadingSubmit || loadingAddress;
 
-  // Preenche os campos do formulário com os dados do usuário atual
-  useEffect(() => {
-    if (user) {
-      form.setFieldsValue({
-        nome: user.nome || user.name,
-        email: user.email,
-        telefone: user.telefone,
-      });
+  const handlePersonalChange = (e) => {
+    const { name, value } = e.target;
+    setPersonalData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (
+      !personalData.nome ||
+      !address.cep ||
+      !address.rua ||
+      !address.numero ||
+      !address.bairro ||
+      !address.cidade ||
+      !address.estado
+    ) {
+      message.warning('Por favor, preencha todos os campos obrigatórios!');
+      return;
     }
-  }, [user, form]);
 
-  const onFinish = async (values) => {
+    if (!cepExist) {
+      message.error('O cep digitado não existe.');
+      return;
+    }
+
     try {
-      setLoading(true);
-      // Aqui você integrará com a sua rota da API para atualizar o usuário
-      // Exemplo: await api.put('/users', values);
+      setLoadingSubmit(true);
 
+      const payload = {
+        ...personalData,
+        ...address,
+        cep: address.cep.replace(/\D/g, ''),
+        uf: address.estado // API expects 'uf' instead of 'estado' based on previous code
+      };
+
+      await api.put(`/users/${user.id}/update-profile`, payload);
+      updateUser(payload);
       message.success('Perfil atualizado com sucesso!');
-      navigate(-1); // Volta para a página anterior
     } catch (error) {
       console.error(error);
       message.error('Erro ao atualizar o perfil. Tente novamente.');
     } finally {
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setPersonalData({
+        nome: user.nome || user.name || '',
+        email: user.email || '',
+      });
+
+      const userAddress = {
+        cep: user?.endereco?.cep || '',
+        rua: user?.endereco?.rua || '',
+        numero: user?.endereco?.numero || '',
+        complemento: user?.endereco?.complemento || '',
+        bairro: user?.endereco?.bairro || '',
+        cidade: user?.endereco?.cidade || '',
+        estado: user?.endereco?.uf || '',
+      };
+      setAddress(userAddress);
+
+      if (user?.endereco?.cep) {
+        fetchAddressByCep(user.endereco.cep, true);
+      } else {
+        setDisabledFields({
+          rua: !!user?.endereco?.rua,
+          bairro: !!user?.endereco?.bairro,
+          cidade: !!user?.endereco?.cidade,
+          estado: !!user?.endereco?.uf,
+        });
+      }
+    }
+  }, [user, setAddress, fetchAddressByCep, setDisabledFields]);
 
   return (
     <LayoutContainer>
@@ -69,62 +145,34 @@ export const EditarPerfil = () => {
               <PageTitle level={2}>Editar Perfil</PageTitle>
             </HeaderContainer>
 
-            <Spin spinning={loading} description="Salvando..." size="large">
-              <AvatarContainer>
-                <Upload
-                  name="avatar"
-                  listType="picture-circle"
-                  showUploadList={false}
-                  action="/mock-url" // Troque pela URL correta da sua API de upload, se houver
-                >
-                  <AvatarIconWrapper>
-                    <UserOutlined />
-                    <AvatarText>Alterar Foto</AvatarText>
-                  </AvatarIconWrapper>
-                </Upload>
-              </AvatarContainer>
+            <Spin spinning={loading} description="Processando..." size="large">
+              <AvatarUpload 
+                user={user} 
+                updateAvatar={updateAvatar} 
+                loading={loadingSubmit} 
+                setLoading={setLoadingSubmit} 
+              />
 
-              <Form form={form} layout="vertical" onFinish={onFinish}>
-                <Form.Item
-                  label="Nome Completo"
-                  name="nome"
-                  rules={[
-                    { required: true, message: 'Por favor, insira seu nome!' },
-                  ]}
-                >
-                  <Input placeholder="Seu nome" size="large" />
-                </Form.Item>
-
-                <Form.Item
-                  label="E-mail"
-                  name="email"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Por favor, insira seu e-mail!',
-                    },
-                    { type: 'email', message: 'E-mail inválido!' },
-                  ]}
-                >
-                  <Input placeholder="seu@email.com" size="large" />
-                </Form.Item>
-
-                <Form.Item label="Telefone" name="telefone">
-                  <Input placeholder="(00) 00000-0000" size="large" />
-                </Form.Item>
-
-                <Form.Item
-                  label="Nova Senha"
-                  name="senha"
-                  tooltip="Deixe em branco caso não queira alterar sua senha atual"
-                >
-                  <Input.Password placeholder="Sua nova senha" size="large" />
-                </Form.Item>
+              <Form layout="vertical">
+                <PersonalFields formData={personalData} handleChange={handlePersonalChange} />
+                
+                <AddressForm 
+                  address={address}
+                  cidadesList={cidadesList}
+                  disabledFields={disabledFields}
+                  onCepBlur={() => fetchAddressByCep(address.cep)}
+                  onEstadoChange={handleEstadoChange}
+                  onChangeField={updateAddressField}
+                  withLabels={true}
+                />
 
                 <Form.Item style={{ marginTop: '2rem', marginBottom: 0 }}>
+                  <Button type="link" size="large" onClick={() => setIsModalOpen(true)} style={{ width: '100%', marginBottom: '1rem' }}>
+                    Alterar senha
+                  </Button>
                   <SubmitButton
                     type="primary"
-                    htmlType="submit"
+                    onClick={handleSubmit}
                     size="large"
                     block
                     loading={loading}
@@ -137,6 +185,14 @@ export const EditarPerfil = () => {
           </ProfileCard>
         </Container>
       </ContentContainer>
+
+      <ChangePasswordModal 
+        user={user}
+        isOpen={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        formPasswordData={formPasswordData}
+        setFormPasswordData={setFormPasswordData}
+      />
     </LayoutContainer>
   );
 };

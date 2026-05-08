@@ -31,16 +31,8 @@ export const FormContainer = styled.div`
   padding: 3rem 2.5rem;
   border-radius: 16px;
   background-color: ${({ theme }) => theme.colors.white};
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.01),
-    0 20px 48px rgba(0, 0, 0, 0.01);
   width: 100%;
   max-width: 500px;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
 `;
 
 export const HeaderContainer = styled.div`
@@ -63,28 +55,6 @@ export const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-`;
-
-export const InputRow = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-export const StyledInput = styled(Input)`
-  flex: ${({ $weight }) => $weight || 'auto'};
-  .anticon {
-    color: ${({ theme }) => theme.colors.gray[400]};
-  }
-`;
-
-export const StyledPassword = styled(Input.Password)`
-  .anticon {
-    color: ${({ theme }) => theme.colors.gray[400]};
-  }
-`;
-
-export const StyledSelect = styled(Select)`
-  flex: ${({ $weight }) => $weight || 'auto'};
 `;
 
 export const SubmitButton = styled(Button)`
