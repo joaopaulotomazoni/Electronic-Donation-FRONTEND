@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Spin, Button, message } from 'antd';
-import { ArrowLeftOutlined, LockOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GlobalHeader } from '../../../components/GlobalHeader';
 import { api } from '../../../services/api';
+import { NewPasswordForm } from './components/NewPasswordForm';
 import {
   Container,
   ContentContainer,
@@ -12,9 +13,6 @@ import {
   HeaderContainer,
   TitleContainer,
   Subtitle,
-  InputWrapper,
-  StyledPassword,
-  SubmitButton,
 } from './styles';
 import { useAuth } from '../../../hooks/useAuth';
 
@@ -96,31 +94,15 @@ export function NovaSenha() {
                 <TitleContainer level={2}>Nova Senha</TitleContainer>
                 <Subtitle>Crie uma nova senha para acessar sua conta</Subtitle>
               </HeaderContainer>
-              <InputWrapper>
-                <StyledPassword
-                  size="large"
-                  prefix={<LockOutlined />}
-                  placeholder="Nova senha"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                />
-                <StyledPassword
-                  size="large"
-                  prefix={<LockOutlined />}
-                  placeholder="Confirmar nova senha"
-                  value={confirmarSenha}
-                  onChange={(e) => setConfirmarSenha(e.target.value)}
-                />
-                <SubmitButton
-                  type="primary"
-                  size="large"
-                  block
-                  loading={loading}
-                  onClick={handleSubmit}
-                >
-                  Redefinir Senha
-                </SubmitButton>
-              </InputWrapper>
+              
+              <NewPasswordForm 
+                senha={senha} 
+                setSenha={setSenha} 
+                confirmarSenha={confirmarSenha} 
+                setConfirmarSenha={setConfirmarSenha} 
+                handleSubmit={handleSubmit} 
+                loading={loading} 
+              />
             </FormContainer>
           </Spin>
         </Container>

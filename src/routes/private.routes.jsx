@@ -4,6 +4,7 @@ import { Home } from '../pages/Home';
 import { TelaDoador } from '../pages/TelaDoador';
 import { TelaRecebedor } from '../pages/TelaRecebedor';
 import { EditarPerfil } from '../pages/EditarPerfil';
+import { Chat } from '../pages/Chat';
 
 export function PrivateRoutes() {
   return (
@@ -11,6 +12,7 @@ export function PrivateRoutes() {
       <Route path="/doador" element={<TelaDoador />} />
       <Route path="/recebedor" element={<TelaRecebedor />} />
       <Route path="/perfil" element={<EditarPerfil />} />
+      <Route path="/chat/:solicitacaoId" element={<Chat />} />
     </Routes>
   );
 }

@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Spin, Button, message } from 'antd';
-import {
-  ArrowLeftOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GlobalHeader } from '../../../components/GlobalHeader';
 import { api } from '../../../services/api';
+import { CodeForm } from './components/CodeForm';
 import {
   Container,
   ContentContainer,
@@ -16,9 +14,6 @@ import {
   HeaderContainer,
   TitleContainer,
   Subtitle,
-  InputWrapper,
-  StyledInput,
-  SubmitButton,
 } from './styles';
 
 export function ConfirmarCodigo() {
@@ -91,24 +86,14 @@ export function ConfirmarCodigo() {
                   <strong>{email}</strong>
                 </Subtitle>
               </HeaderContainer>
-              <InputWrapper>
-                <StyledInput
-                  size="large"
-                  prefix={<SafetyCertificateOutlined />}
-                  placeholder="Código de 6 dígitos"
-                  value={codigo}
-                  onChange={(e) => setCodigo(e.target.value)}
-                />
-                <SubmitButton
-                  type="primary"
-                  size="large"
-                  block
-                  loading={loading}
-                  onClick={handleSubmit}
-                >
-                  Verificar Código
-                </SubmitButton>
-              </InputWrapper>
+              
+              <CodeForm 
+                codigo={codigo} 
+                setCodigo={setCodigo} 
+                handleSubmit={handleSubmit} 
+                loading={loading} 
+              />
+
               <LinkContainer>
                 Lembrou a senha?{' '}
                 <a onClick={() => navigate('/login')}>Fazer login</a>

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Layout, Typography, Card } from 'antd';
+import { Layout, Typography } from 'antd';
 
 const { Title, Text } = Typography;
 
@@ -37,27 +37,4 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-`;
-
-export const StyledCard = styled(Card)`
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-
-  .ant-card-head {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  }
-`;
-
-export const DeviceImagePreview = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-`;
-
-export const ListTitle = styled.span`
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.gray[800]};
 `;
