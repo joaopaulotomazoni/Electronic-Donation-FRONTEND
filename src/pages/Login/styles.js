@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { Layout, Typography, Button, Input } from 'antd';
+import { Layout, Typography } from 'antd';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const LayoutContainer = styled(Layout)`
   min-height: 100vh;
@@ -28,59 +28,27 @@ export const Container = styled.div`
 export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 3rem 2.5rem;
+  padding: 32px;
   border-radius: 16px;
   background-color: ${({ theme }) => theme.colors.white};
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.01),
-    0 20px 48px rgba(0, 0, 0, 0.01);
   width: 100%;
   max-width: 400px;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
 `;
 
 export const HeaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
 `;
 
 export const TitleContainer = styled(Title)`
   && {
     color: ${({ theme }) => theme.colors.blue[500]};
-    margin-bottom: 4px;
-  }
-`;
-
-export const Subtitle = styled(Text)`
-  color: ${({ theme }) => theme.colors.gray[500]};
-`;
-
-export const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-export const StyledInput = styled(Input)`
-  .anticon {
-    color: ${({ theme }) => theme.colors.gray[400]};
-  }
-`;
-
-export const StyledPassword = styled(Input.Password)`
-  .anticon {
-    color: ${({ theme }) => theme.colors.gray[400]};
-  }
-`;
-
-export const SubmitButton = styled(Button)`
-  && {
-    margin-top: 0.5rem;
-    background-color: ${({ theme }) => theme.colors.blue[500]};
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
   }
 `;
 
@@ -98,10 +66,4 @@ export const LinkContainer = styled.p`
       text-decoration: underline;
     }
   }
-`;
-
-export const RecoverPasswordContainer = styled.div`
-  text-align: right;
-  width: 100%;
-  margin-top: -0.5rem;
 `;

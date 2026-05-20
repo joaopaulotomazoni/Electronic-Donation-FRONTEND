@@ -6,10 +6,7 @@ const { Title, Text } = Typography;
 export const StyledCard = styled(Card)`
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease;
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   height: 100%;
   width: 344px;
@@ -17,11 +14,6 @@ export const StyledCard = styled(Card)`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-  }
 
   .ant-card-cover {
     height: 200px;

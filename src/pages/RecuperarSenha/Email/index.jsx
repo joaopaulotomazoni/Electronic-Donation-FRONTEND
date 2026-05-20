@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Spin, Button, message } from 'antd';
-import { ArrowLeftOutlined, MailOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GlobalHeader } from '../../../components/GlobalHeader';
 import { api } from '../../../services/api';
+import { EmailForm } from './components/EmailForm';
 import {
   Container,
   ContentContainer,
@@ -13,9 +14,6 @@ import {
   HeaderContainer,
   TitleContainer,
   Subtitle,
-  InputWrapper,
-  StyledInput,
-  SubmitButton,
 } from './styles';
 
 export function Email() {
@@ -31,10 +29,7 @@ export function Email() {
 
     try {
       setLoading(true);
-
       await api.post('/forgot-password/send-code', { email });
-
-      console.log('enviado');
       message.success('Código de verificação enviado!');
       navigate('/recuperar-senha/codigo-verificacao', { state: { email } });
     } catch (error) {
@@ -72,24 +67,14 @@ export function Email() {
                   Digite seu e-mail para receber um código de verificação
                 </Subtitle>
               </HeaderContainer>
-              <InputWrapper>
-                <StyledInput
-                  size="large"
-                  prefix={<MailOutlined />}
-                  placeholder="E-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <SubmitButton
-                  type="primary"
-                  size="large"
-                  block
-                  loading={loading}
-                  onClick={handleSubmit}
-                >
-                  Enviar Código
-                </SubmitButton>
-              </InputWrapper>
+              
+              <EmailForm 
+                email={email} 
+                setEmail={setEmail} 
+                handleSubmit={handleSubmit} 
+                loading={loading} 
+              />
+
               <LinkContainer>
                 Lembrou a senha? <Link to="/login">Fazer login</Link>
               </LinkContainer>

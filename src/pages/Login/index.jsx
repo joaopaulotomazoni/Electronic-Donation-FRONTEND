@@ -8,23 +8,14 @@ import {
   LayoutContainer,
   HeaderContainer,
   TitleContainer,
-  Subtitle,
-  InputWrapper,
-  StyledInput,
-  StyledPassword,
-  SubmitButton,
-  RecoverPasswordContainer,
 } from './styles';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import { Spin, Button, message } from 'antd';
-import {
-  ArrowLeftOutlined,
-  MailOutlined,
-  LockOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined, LaptopOutlined } from '@ant-design/icons';
 import { GlobalHeader } from '../../components/GlobalHeader';
+import { LoginForm } from './components/LoginForm';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -78,41 +69,17 @@ export const Login = () => {
           <Spin spinning={loading} description="Autenticando..." size="large">
             <FormContainer>
               <HeaderContainer>
-                <TitleContainer level={2}>Bem-vindo</TitleContainer>
-                <Subtitle>Faça login na sua conta para continuar</Subtitle>
+                <TitleContainer level={2}>Electronic Donation</TitleContainer>
               </HeaderContainer>
 
-              <InputWrapper>
-                <StyledInput
-                  size="large"
-                  prefix={<MailOutlined />}
-                  placeholder="E-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-
-                <StyledPassword
-                  size="large"
-                  prefix={<LockOutlined />}
-                  placeholder="Senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-
-                <RecoverPasswordContainer>
-                  <Link to="/recuperar-senha/email">Esqueceu sua senha?</Link>
-                </RecoverPasswordContainer>
-
-                <SubmitButton
-                  type="primary"
-                  size="large"
-                  block
-                  loading={loading}
-                  onClick={handleSubmit}
-                >
-                  Entrar
-                </SubmitButton>
-              </InputWrapper>
+              <LoginForm
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                handleSubmit={handleSubmit}
+                loading={loading}
+              />
 
               <LinkContainer>
                 Ainda não possui conta? <Link to="/signup">Criar conta</Link>
