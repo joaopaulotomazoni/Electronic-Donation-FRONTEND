@@ -1,9 +1,13 @@
 import { List, Button, Tag, Typography } from 'antd';
+import { MessageOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { StyledCard, ListTitle, DeviceImagePreview } from './styles';
 
 const { Title } = Typography;
 
 export const MyDonationsList = ({ devices, showDrawer, loading }) => {
+  const navigate = useNavigate();
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'Disponível':
@@ -18,7 +22,11 @@ export const MyDonationsList = ({ devices, showDrawer, loading }) => {
 
   return (
     <StyledCard
-      title={<Title level={4} style={{ margin: 0 }}>Minhas Doações</Title>}
+      title={
+        <Title level={4} style={{ margin: 0 }}>
+          Minhas Doações
+        </Title>
+      }
       style={{ width: '100%', minWidth: 400 }}
     >
       <List
@@ -35,6 +43,26 @@ export const MyDonationsList = ({ devices, showDrawer, loading }) => {
                 disabled={donation.status === 'Aceito'}
               >
                 Editar
+              </Button>,
+              <Button
+                type="link"
+                icon={<MessageOutlined />}
+                size="small"
+                onClick={() => {
+                  const acceptedRequest = donation.solicitacoes?.find(
+                    (req) => req.status?.toLowerCase() === 'aceito'
+                  );
+                  if (acceptedRequest) {
+                    navigate(`/chat/${acceptedRequest.id}`, {
+                      state: {
+                        item: { ...acceptedRequest, dispositivo: donation },
+                      },
+                    });
+                  }
+                }}
+                disabled={donation.status !== 'Aceito'}
+              >
+                Chat
               </Button>,
             ]}
           >

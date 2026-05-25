@@ -56,7 +56,7 @@ export function TelaDoador() {
     setFileList,
     registerDevice,
     setRegisterDevice,
-    handleSubmit
+    handleSubmit,
   } = useDonationRegistration(user?.id, fetchDevices);
 
   const getBase64 = (file) =>
@@ -67,16 +67,23 @@ export function TelaDoador() {
       reader.onerror = (error) => reject(error);
     });
 
-  const handleUpdateStatus = async (deviceId, status) => {
+  const handleUpdateStatus = async (idSolicitacao, idDispositivo, status) => {
     try {
       setLoading(true);
-      await api.put(`/${deviceId}/updateStatus`, {
+      await api.put(`/${idSolicitacao}/updateStatus`, {
         status,
       });
       message.success(`Solicitação atualizada com sucesso!`);
-      setSolicitacoesRecebidas((prev) =>
-        prev.filter((req) => req.id_dispositivo !== deviceId)
-      );
+
+      if (status === 'aceito') {
+        setSolicitacoesRecebidas((prev) =>
+          prev.filter((req) => req.id_dispositivo !== idDispositivo)
+        );
+      } else {
+        setSolicitacoesRecebidas((prev) =>
+          prev.filter((req) => req.id !== idSolicitacao)
+        );
+      }
       fetchDevices();
     } catch (error) {
       console.error(error);
@@ -211,6 +218,7 @@ export function TelaDoador() {
       try {
         setLoading(true);
         const response = await api.get(`/${user.id}/user-device-with-request`);
+        console.log(solicitacoesRecebidas);
         setSolicitacoesRecebidas(response.data);
       } catch (error) {
         console.error('Erro ao carregar as solicitações:', error);
@@ -245,7 +253,7 @@ export function TelaDoador() {
         </HeaderContainer>
 
         <Content>
-          <RegisterDonationForm 
+          <RegisterDonationForm
             registerDevice={registerDevice}
             setRegisterDevice={setRegisterDevice}
             fileList={fileList}
@@ -254,17 +262,22 @@ export function TelaDoador() {
             loading={loadingReg}
           />
 
-          <Space direction="vertical" size="large" style={{ display: 'flex', width: '100%', minWidth: 400 }}>
-            <MyDonationsList 
-              devices={dispositivosDoar} 
-              showDrawer={showDrawer} 
-              loading={loading} 
+          <Space
+            direction="vertical"
+            size="large"
+            style={{ display: 'flex', width: '100%', minWidth: 400 }}
+          >
+            <MyDonationsList
+              devices={dispositivosDoar}
+              showDrawer={showDrawer}
+              loading={loading}
+              requests={solicitacoesRecebidas}
             />
 
-            <ReceivedRequestsList 
-              requests={solicitacoesRecebidas} 
-              handleUpdateStatus={handleUpdateStatus} 
-              loading={loading} 
+            <ReceivedRequestsList
+              requests={solicitacoesRecebidas}
+              handleUpdateStatus={handleUpdateStatus}
+              loading={loading}
             />
           </Space>
         </Content>

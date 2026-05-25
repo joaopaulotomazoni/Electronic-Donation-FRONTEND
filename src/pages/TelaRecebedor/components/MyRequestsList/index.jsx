@@ -1,9 +1,14 @@
-import { List, Tag, Button, Spin, Typography } from 'antd';
+import { List, Tag, Button, Spin, Typography, Space } from 'antd';
+import { MessageOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { StyledCard, ListTitle, DeviceImagePreview } from './styles';
 
 const { Title } = Typography;
 
 export const MyRequestsList = ({ requests, showModal, loading }) => {
+  const navigate = useNavigate();
+  console.log({ requests });
+
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'pendente':
@@ -19,9 +24,17 @@ export const MyRequestsList = ({ requests, showModal, loading }) => {
 
   return (
     <StyledCard
-      title={<Title level={4} style={{ margin: 0 }}>Minhas Solicitações</Title>}
+      title={
+        <Title level={4} style={{ margin: 0 }}>
+          Minhas Solicitações
+        </Title>
+      }
     >
-      <Spin spinning={loading} size="large" description="Carregando solicitações...">
+      <Spin
+        spinning={loading}
+        size="large"
+        description="Carregando solicitações..."
+      >
         <List
           itemLayout="horizontal"
           dataSource={requests}
@@ -50,9 +63,20 @@ export const MyRequestsList = ({ requests, showModal, loading }) => {
                   </Tag>
                 }
               />
-              <Button type="primary" onClick={() => showModal(item)}>
-                Ver detalhes
-              </Button>
+              <Space>
+                <Button
+                  icon={<MessageOutlined />}
+                  onClick={() =>
+                    navigate(`/chat/${item.id}`, { state: { item } })
+                  }
+                  disabled={item.status !== 'aceito'}
+                >
+                  Chat
+                </Button>
+                <Button type="primary" onClick={() => showModal(item)}>
+                  Ver detalhes
+                </Button>
+              </Space>
             </List.Item>
           )}
         />

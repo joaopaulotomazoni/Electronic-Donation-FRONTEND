@@ -54,7 +54,7 @@ export const LoginForm = ({
         loading={loading}
         onClick={handleSubmit}
       >
-        Log in
+        Entrar
       </SubmitButton>
     </InputWrapper>
   );
