@@ -70,7 +70,7 @@ export function DeviceDetailsModal({ selectedSolicitacao }) {
             {selectedSolicitacao.status}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Sua Justificativa">
+        <Descriptions.Item label="Justificativa">
           {selectedSolicitacao.justificativa || 'Não informada.'}
         </Descriptions.Item>
         <Descriptions.Item label="Categoria do Dispositivo">
