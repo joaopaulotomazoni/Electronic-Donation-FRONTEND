@@ -5,6 +5,7 @@ import { TelaDoador } from '../pages/TelaDoador';
 import { TelaRecebedor } from '../pages/TelaRecebedor';
 import { EditarPerfil } from '../pages/EditarPerfil';
 import { Chat } from '../pages/Chat';
+import { TelaHistorico } from '../pages/TelaHistorico';
 
 export function PrivateRoutes() {
   return (
@@ -13,6 +14,7 @@ export function PrivateRoutes() {
       <Route path="/recebedor" element={<TelaRecebedor />} />
       <Route path="/perfil" element={<EditarPerfil />} />
       <Route path="/chat/:solicitacaoId" element={<Chat />} />
+      <Route path="/historico" element={<TelaHistorico />} />
     </Routes>
   );
 }

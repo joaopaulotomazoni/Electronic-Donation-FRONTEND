@@ -32,6 +32,11 @@ export const UserMenu = ({ isAuthenticated, user, signOut }) => {
       onClick: () => navigate('/recebedor'),
     },
     {
+      key: 'historico',
+      label: 'Histórico',
+      onClick: () => navigate('/historico'),
+    },
+    {
       type: 'divider',
     },
     {

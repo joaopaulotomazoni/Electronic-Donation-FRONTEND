@@ -35,17 +35,15 @@ export function Chat() {
     user.id
   );
 
-  const messageListRef = useRef(null);
+  const messageListRef = useRef(solicitacaoId);
 
   useEffect(() => {
     async function fetchSolicitacao() {
       try {
         setLoading(true);
-        const historyResponse = await api.get(
-          `/chat/${solicitacaoId}/messages`
-        );
+        const chatInfo = await api.get(`/chat/${solicitacaoId}/messages`);
 
-        const historicalMessages = historyResponse.data;
+        const historicalMessages = chatInfo.data;
 
         const formattedHistoricalMessages = historicalMessages.map(
           (message) => {
