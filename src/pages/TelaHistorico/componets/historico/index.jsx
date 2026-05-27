@@ -74,12 +74,11 @@ export function HistoricoList() {
           <StyledListItem
           actions={[
             <Button type="primary" onClick={() => {
-              // Se for um dispositivo direto, adaptamos o formato para o Modal não quebrar
               if (isDeviceDirect) {
                 setSelectedSolicitacao({
                   status: status,
                   dispositivos: device,
-                  usuarios: user, // Você é o doador neste caso
+                  usuarios: user, 
                   justificativa: 'Dispositivo cadastrado por você para doação.'
                 });
               } else {
