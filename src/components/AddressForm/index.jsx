@@ -1,16 +1,20 @@
-import { EnvironmentOutlined, HomeOutlined, NumberOutlined } from '@ant-design/icons';
+import {
+  EnvironmentOutlined,
+  HomeOutlined,
+  NumberOutlined,
+} from '@ant-design/icons';
 import { Form } from 'antd';
 import { UF } from '../../constants/uf';
 import { InputRow, StyledInput, StyledSelect } from './styles';
 
-export const AddressForm = ({ 
-  address, 
-  cidadesList, 
-  disabledFields, 
-  onCepBlur, 
-  onEstadoChange, 
+export const AddressForm = ({
+  address,
+  cidadesList,
+  disabledFields,
+  onCepBlur,
+  onEstadoChange,
   onChangeField,
-  withLabels = false
+  withLabels = false,
 }) => {
   const formatCep = (value) => {
     let val = value.replace(/\D/g, '');
@@ -19,7 +23,19 @@ export const AddressForm = ({
     return val;
   };
 
-  const renderInput = (name, label, icon, placeholder, value, onChange, onBlur, disabled, weight, maxLength, type = 'text') => {
+  const renderInput = (
+    name,
+    label,
+    icon,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    disabled,
+    weight,
+    maxLength,
+    type = 'text'
+  ) => {
     const input = (
       <StyledInput
         $weight={weight}
@@ -37,7 +53,11 @@ export const AddressForm = ({
 
     if (withLabels) {
       return (
-        <Form.Item label={label} required={label !== 'Complemento'} style={{ flex: weight || 'auto' }}>
+        <Form.Item
+          label={label}
+          required={label !== 'Complemento'}
+          style={{ flex: weight || 'auto' }}
+        >
           {input}
         </Form.Item>
       );
@@ -47,7 +67,18 @@ export const AddressForm = ({
 
   return (
     <>
-      {renderInput('cep', 'CEP', <EnvironmentOutlined />, 'CEP', address.cep, (e) => onChangeField('cep', formatCep(e.target.value)), onCepBlur, false, null, 9)}
+      {renderInput(
+        'cep',
+        'CEP',
+        <EnvironmentOutlined />,
+        'CEP',
+        address.cep,
+        (e) => onChangeField('cep', e.target.value),
+        onCepBlur,
+        false,
+        null,
+        9
+      )}
 
       <InputRow>
         {withLabels ? (
@@ -101,14 +132,50 @@ export const AddressForm = ({
         )}
       </InputRow>
 
-      {renderInput('bairro', 'Bairro', <HomeOutlined />, 'Bairro', address.bairro, (e) => onChangeField('bairro', e.target.value), null, disabledFields.bairro)}
+      {renderInput(
+        'bairro',
+        'Bairro',
+        <HomeOutlined />,
+        'Bairro',
+        address.bairro,
+        (e) => onChangeField('bairro', e.target.value),
+        null,
+        disabledFields.bairro
+      )}
 
       <InputRow>
-        {renderInput('rua', 'Rua', <HomeOutlined />, 'Rua', address.rua, (e) => onChangeField('rua', e.target.value), null, disabledFields.rua, 2)}
-        {renderInput('numero', 'Número', <NumberOutlined />, 'Número', address.numero, (e) => onChangeField('numero', e.target.value.replace(/\D/g, '')), null, false, 1)}
+        {renderInput(
+          'rua',
+          'Rua',
+          <HomeOutlined />,
+          'Rua',
+          address.rua,
+          (e) => onChangeField('rua', e.target.value),
+          null,
+          disabledFields.rua,
+          2
+        )}
+        {renderInput(
+          'numero',
+          'Número',
+          <NumberOutlined />,
+          'Número',
+          address.numero,
+          (e) => onChangeField('numero', e.target.value.replace(/\D/g, '')),
+          null,
+          false,
+          1
+        )}
       </InputRow>
 
-      {renderInput('complemento', 'Complemento', <HomeOutlined />, 'Complemento (Opcional)', address.complemento, (e) => onChangeField('complemento', e.target.value))}
+      {renderInput(
+        'complemento',
+        'Complemento',
+        <HomeOutlined />,
+        'Complemento (Opcional)',
+        address.complemento,
+        (e) => onChangeField('complemento', e.target.value)
+      )}
     </>
   );
 };

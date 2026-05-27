@@ -7,8 +7,10 @@ import { EditarPerfil } from '../pages/EditarPerfil';
 import { Chat } from '../pages/Chat';
 import { TelaHistorico } from '../pages/TelaHistorico';
 import { Admin } from '../pages/Admin';
-
+import { useAuth } from '../hooks/useAuth';
 export function PrivateRoutes() {
+  const { user } = useAuth();
+
   return (
     <Routes>
       <Route path="/doador" element={<TelaDoador />} />
@@ -16,7 +18,8 @@ export function PrivateRoutes() {
       <Route path="/perfil" element={<EditarPerfil />} />
       <Route path="/chat/:solicitacaoId" element={<Chat />} />
       <Route path="/historico" element={<TelaHistorico />} />
-      <Route path="/admin" element={<Admin />} />
+
+      {user.isAdmin && <Route path="/admin" element={<Admin />} />}
     </Routes>
   );
 }

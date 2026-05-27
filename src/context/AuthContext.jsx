@@ -34,6 +34,7 @@ export function AuthProvider({ children }) {
         complemento: userData.complemento,
       },
       token,
+      isAdmin: userData.isAdmin,
     };
 
     setUser(userInfo);

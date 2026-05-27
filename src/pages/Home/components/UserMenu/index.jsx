@@ -36,11 +36,15 @@ export const UserMenu = ({ isAuthenticated, user, signOut }) => {
       label: 'Histórico',
       onClick: () => navigate('/historico'),
     },
-    {
-      key: 'admin',
-      label: 'Admin',
-      onClick: () => navigate('/admin'),
-    },
+    ...(user?.isAdmin
+      ? [
+          {
+            key: 'admin',
+            label: 'Admin',
+            onClick: () => navigate('/admin'),
+          },
+        ]
+      : []),
     {
       type: 'divider',
     },
