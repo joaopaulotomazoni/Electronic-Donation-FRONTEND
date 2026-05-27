@@ -37,6 +37,11 @@ export const UserMenu = ({ isAuthenticated, user, signOut }) => {
       onClick: () => navigate('/historico'),
     },
     {
+      key: 'admin',
+      label: 'Admin',
+      onClick: () => navigate('/admin'),
+    },
+    {
       type: 'divider',
     },
     {
