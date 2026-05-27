@@ -1,5 +1,4 @@
 import { List, Button, Tag, Typography } from 'antd';
-import { MessageOutlined } from '@ant-design/icons';
 import { StyledCard, ListTitle, DeviceImagePreview } from './styles';
 
 const { Title } = Typography;
