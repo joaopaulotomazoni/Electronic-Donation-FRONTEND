@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { GlobalHeader } from '../../components/GlobalHeader'
 import { Button, Spin, Tabs, message } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -8,6 +8,7 @@ import { DoughnutChart } from './components/DoughnutChart'
 import { api } from '../../services/api';
 import { MyDonationsList } from './components/MyDonationsList/index.jsx';
 import { EditarDoacoes } from '../TelaDoador/EditarDoacoes/index';
+import { useAuth } from '../../hooks/useAuth';
 
 import {
     Container, PageTitle, HeaderContainer,
@@ -24,8 +25,9 @@ import {
 
 export function Admin() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [useData, setUseData] = useState([]);
+    const [useData, setUseData] = useState({});
     const [dispositivosDoar, setdispositivosDoar] = useState([]);
     const [editingDevice, setEditingDevice] = useState(null);
     const [editFormData, setEditFormData] = useState({});
@@ -33,14 +35,16 @@ export function Admin() {
     const [editFileList, setEditFileList] = useState([]);
     const [imagesToDelete, setImagesToDelete] = useState([]);
 
-    const fetchDevices = async () => {
+    const fetchDevices = useCallback(async () => {
         try {
-            const deviceResponse = await api.get('/devices');
+            const deviceResponse = await api.get('/devices', {
+                headers: { 'X-User-Id': user?.id }
+            });
             setdispositivosDoar(deviceResponse.data);
         } catch (error) {
             console.error('Erro ao carregar os dispositivos:', error);
         }
-    };
+    }, [user?.id]);
 
     const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -105,7 +109,6 @@ export function Admin() {
 
       const base64Images = await Promise.all(
         newImages.map(async (file) => {
-          if (file.url) return file.url;
           return await getBase64(file);
         })
       );
@@ -118,7 +121,8 @@ export function Admin() {
 
       await api.put(
         `/${editingDevice.id || editingDevice.id_dispositivo}/device/update`,
-        payload
+        payload,
+        { headers: { 'X-User-Id': user?.id } }
       );
 
       message.success('Doação atualizada com sucesso!');
@@ -137,7 +141,8 @@ export function Admin() {
     try {
       setLoading(true);
       await api.delete(
-        `/${editingDevice.id || editingDevice.id_dispositivo}/device/delete`
+        `/${editingDevice.id || editingDevice.id_dispositivo}/device/delete`,
+        { headers: { 'X-User-Id': user?.id } }
       );
 
       message.success('Doação excluída com sucesso!');
@@ -175,31 +180,37 @@ export function Admin() {
         async function fetchData() {
             try {
                 setLoading(true);
-                const response = await api.get('/admin/dashboard');
+                const response = await api.get('/admin/dashboard', {
+                    headers: { 'X-User-Id': user?.id }
+                });
                 setUseData(response.data);
                 await fetchDevices();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                message.error('Não foi possível carregar os dados do painel.');
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    message.error('Acesso restrito. Redirecionando...');
+                    navigate('/');
+                } else {
+                    message.error('Não foi possível carregar os dados do painel.');
+                }
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchData();
-    }, []);
+        if (user?.id) {
+            fetchData();
+        }
+    }, [user?.id, fetchDevices, navigate]);
 
     const TotalDoacoes = (useData?.inventory?.distribution?.doado || 0) + (useData?.inventory?.distribution?.doar || 0);
     const chartColors = ['#1677ff', '#faad14', '#722ed1'];
-    const charData1 = () => {
-        const categories = useData?.inventory?.topCategories || [];
-
-        return categories.map((item, index) => ({
-            ...item,
-            color: chartColors[index % chartColors.length],
-            percentage: TotalDoacoes > 0 ? Number(((item.value / TotalDoacoes) * 100).toFixed(1)) : 0
-        }));
-    };
+    
+    const chartData = (useData?.inventory?.topCategories || []).map((item, index) => ({
+        ...item,
+        color: chartColors[index % chartColors.length],
+        percentage: TotalDoacoes > 0 ? Number(((item.value / TotalDoacoes) * 100).toFixed(1)) : 0
+    }));
 
         return (
             <>
@@ -240,9 +251,9 @@ export function Admin() {
 
                                             <ChartSection>
                                                 <PageTitle level={3}>Total de dispostivos por categoria</PageTitle>
-                                                <DoughnutChart data={charData1()} total={TotalDoacoes} />
+                                                <DoughnutChart data={chartData} total={TotalDoacoes} />
                                                 <LegendList>
-                                                    {charData1().map((item, index) => (
+                                                    {chartData.map((item, index) => (
                                                         <LegendItem key={index}>
                                                             <LegendColor style={{ backgroundColor: item.color }} />
                                                             <LegendLabel>{item.name}</LegendLabel>
