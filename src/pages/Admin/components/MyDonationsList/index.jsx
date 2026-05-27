@@ -7,11 +7,12 @@ export const MyDonationsList = ({ devices, showDrawer, loading }) => {
 
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Disponível':
-      case 'Aceito':
+    switch (status?.toLowerCase()) {
+      case 'disponível':
+      case 'aceito':
+      case 'doado':
         return 'success';
-      case 'Pendente':
+      case 'pendente':
         return 'processing';
       default:
         return 'default';
@@ -38,7 +39,7 @@ export const MyDonationsList = ({ devices, showDrawer, loading }) => {
                 type="link"
                 size="small"
                 onClick={() => showDrawer(donation)}
-                disabled={donation.status === 'Aceito'}
+                disabled={donation.status?.toLowerCase() === 'doado'}
               >
                 Editar
               </Button>
